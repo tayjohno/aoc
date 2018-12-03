@@ -1,11 +1,25 @@
 module DayOneInput exposing (input)
 
 
-input : String -> List Int
-input input =
-    input
+input : List Int
+input =
+    rawInput
         |> String.split "\n"
         |> List.filterMap parseNumberString
+
+
+parseNumberString : String -> Maybe Int
+parseNumberString string =
+    case String.uncons string of
+        Just ( '+', num ) ->
+            String.toInt num
+
+        Just ( '-', num ) ->
+            String.toInt num
+                |> Maybe.andThen (Just << negate)
+
+        _ ->
+            Nothing
 
 
 rawInput : String

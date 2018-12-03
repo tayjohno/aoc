@@ -17,13 +17,13 @@ prettyPrint ( array, size ) =
 
 
 printLines : Int -> Matrix comparable -> Maybe a
-printLines index matrix =
+printLines index ( array, size ) =
     let
         nextRow =
-            Array.slice
+            Array.slice (index * size) (index * (size + 1)) array
     in
     if Array.length (Debug.log "" nextRow) > 0 then
-        printLines (index + 1) matrix
+        printLines (index + 1) ( array, size )
 
     else
         Nothing

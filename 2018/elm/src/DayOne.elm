@@ -5,20 +5,6 @@ import DayOneInput exposing (input)
 import Set exposing (Set)
 
 
-parseNumberString : String -> Maybe Int
-parseNumberString input =
-    case String.uncons input of
-        Just ( '+', num ) ->
-            String.toInt num
-
-        Just ( '-', num ) ->
-            String.toInt num
-                |> Maybe.andThen (Just << negate)
-
-        _ ->
-            Nothing
-
-
 nextCycle : ( Int, Array a ) -> ( Maybe a, ( Int, Array a ) )
 nextCycle ( index, array ) =
     case Array.get index array of
