@@ -1,4 +1,4 @@
-module DayOne exposing (inputString, nextCycle, parseInput, parseNumberString, problemOne, problemTwo)
+module DayOne exposing (partOne, partTwo)
 
 import Array exposing (Array)
 import DayOneInput exposing (input)
@@ -17,20 +17,18 @@ nextCycle ( index, array ) =
             )
 
 
-problemOne : Int
-problemOne =
-    inputString
-        |> parseInput
+partOne : Int
+partOne =
+    input
         |> List.foldl (+) 0
 
 
-problemTwo : Maybe Int
-problemTwo =
+partTwo : Maybe Int
+partTwo =
     problemTwoStep 0
         Set.empty
         ( 0
-        , inputString
-            |> parseInput
+        , input
             |> Array.fromList
         )
 

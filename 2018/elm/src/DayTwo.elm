@@ -1,4 +1,4 @@
-module DayTwo exposing (matchingSubstring, partOne, partTwo, withinOne)
+module DayTwo exposing (partOne, partTwo)
 
 import DayTwoInput exposing (input)
 import Dict exposing (Dict)
@@ -19,13 +19,6 @@ partOne =
             sum (Tuple.second checksumParts)
     in
     twos * threes
-
-
-
--- Returns a tuple representing if a string has two or three matching
--- characters. The first number is either 0 or 1 indicating if there are two
--- matching characters and the second is either 0 or 1 indicating if there are
--- three matching characters.
 
 
 checksumTuple : String -> ( Int, Int )
@@ -116,6 +109,10 @@ withinOne stringA stringB =
 
     else
         Nothing
+
+
+
+-- Search through an array for a value that is Just something
 
 
 findSomething : List (Maybe a) -> Maybe a
