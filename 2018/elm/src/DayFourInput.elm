@@ -1,6 +1,7 @@
-module DayFourInput exposing (Action(..), Date, Event, Guard, Status(..), actionParser, beginShiftParser, dateParser, guardParser, input, rawInput)
+module DayFourInput exposing (Action(..), Date, Event, Guard, Status(..), debugInput, input)
 
-import Parser exposing ((|.), (|=), Parser, int, keyword, map, number, oneOf, spaces, succeed, symbol)
+import Dict
+import Parser exposing ((|.), (|=), Parser, andThen, end, int, keyword, map, number, oneOf, run, spaces, succeed, symbol)
 
 
 type Status
@@ -9,7 +10,7 @@ type Status
 
 
 type alias Event =
-    { date : Date, action : Action, guard : Maybe Guard }
+    { date : Date, action : Action }
 
 
 type alias Date =
@@ -26,24 +27,71 @@ type alias Guard =
     Int
 
 
+input : List Event
 input =
-    Debug.todo "Implement Me"
+    Result.withDefault [] (run eventListParser rawInput)
+
+
+debugInput : String
+debugInput =
+    input
+        |> List.map eventString
+        |> String.join "\n"
+
+
+eventString : Event -> String
+eventString event =
+    actionString event.action ++ " @ " ++ dateString event.date
+
+
+dateString : Date -> String
+dateString date =
+    String.fromInt date.year
+        ++ "/"
+        ++ String.fromInt date.month
+        ++ "/"
+        ++ String.fromInt date.day
+        ++ " "
+        ++ String.fromInt date.hour
+        ++ ":"
+        ++ String.fromInt date.minute
+
+
+actionString : Action -> String
+actionString action =
+    case action of
+        WakeUp ->
+            "WakeUp"
+
+        FallAsleep ->
+            "FallAsleep"
+
+        StartShift guard ->
+            "StartShift for Guard #" ++ String.fromInt guard
 
 
 dateParser : Parser Date
 dateParser =
     succeed Date
         |. symbol "["
-        |= int
+        |= dateInt
         |. symbol "-"
-        |= int
+        |= dateInt
         |. symbol "-"
-        |= int
+        |= dateInt
         |. spaces
-        |= int
+        |= dateInt
         |. symbol ":"
-        |= int
+        |= dateInt
         |. symbol "]"
+
+
+dateInt : Parser Int
+dateInt =
+    oneOf
+        [ succeed identity |. symbol "0" |= int
+        , int
+        ]
 
 
 guardParser : Parser Guard
@@ -58,16 +106,36 @@ guardParser =
 actionParser : Parser Action
 actionParser =
     oneOf
-        [ beginShiftParser
-        , map (\_ -> FallAsleep) (keyword "falls")
-        , map (\_ -> WakeUp) (keyword "wakes")
+        [ succeed StartShift |= guardParser |. spaces |. keyword "begins" |. spaces |. keyword "shift"
+        , map (\_ -> FallAsleep) (keyword "falls" |. spaces |. keyword "asleep")
+        , map (\_ -> WakeUp) (keyword "wakes" |. spaces |. keyword "up")
         ]
 
 
-beginShiftParser : Parser Action
-beginShiftParser =
-    succeed StartShift
-        |= guardParser
+eventParser : Parser Event
+eventParser =
+    succeed Event
+        |= dateParser
+        |. spaces
+        |= actionParser
+
+
+eventListParser : Parser (List Event)
+eventListParser =
+    eventListHelper []
+
+
+eventListHelper : List Event -> Parser (List Event)
+eventListHelper list =
+    oneOf
+        [ eventParser
+            |. oneOf
+                [ symbol "\n"
+                , succeed ()
+                ]
+            |> andThen (\a -> eventListHelper (a :: list))
+        , succeed list
+        ]
 
 
 rawInput =
