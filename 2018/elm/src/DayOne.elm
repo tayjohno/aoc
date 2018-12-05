@@ -17,13 +17,14 @@ nextCycle ( index, array ) =
             )
 
 
-partOne : Int
+partOne : String
 partOne =
     input
         |> List.foldl (+) 0
+        |> String.fromInt
 
 
-partTwo : Maybe Int
+partTwo : String
 partTwo =
     problemTwoStep 0
         Set.empty
@@ -31,17 +32,18 @@ partTwo =
         , input
             |> Array.fromList
         )
+        |> String.fromInt
 
 
-problemTwoStep : Int -> Set Int -> ( Int, Array Int ) -> Maybe Int
+problemTwoStep : Int -> Set Int -> ( Int, Array Int ) -> Int
 problemTwoStep currentSum pastSums cycle =
     if Set.member currentSum pastSums then
-        Just currentSum
+        currentSum
 
     else
         case nextCycle cycle of
             ( Nothing, _ ) ->
-                Nothing
+                -1
 
             ( Just next, rest ) ->
                 problemTwoStep (currentSum + next) (Set.insert currentSum pastSums) rest

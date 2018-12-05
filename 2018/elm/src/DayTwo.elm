@@ -4,7 +4,7 @@ import DayTwoInput exposing (input)
 import Dict exposing (Dict)
 
 
-partOne : Int
+partOne : String
 partOne =
     let
         checksumParts =
@@ -18,7 +18,8 @@ partOne =
         threes =
             sum (Tuple.second checksumParts)
     in
-    twos * threes
+    (twos * threes)
+        |> String.fromInt
 
 
 checksumTuple : String -> ( Int, Int )

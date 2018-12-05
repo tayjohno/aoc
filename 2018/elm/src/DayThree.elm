@@ -5,12 +5,18 @@ import DayThreeInput exposing (Dimensions, Rectangle, input)
 import DynamicMatrix exposing (Coordinate, Matrix, get, set, transformElement)
 
 
+partOne : String
 partOne =
-    countWhere 0 (\a -> a > 1) (Array.toList matrixSolution.data)
+    matrixSolution.data
+        |> Array.toList
+        |> countWhere 0 (\a -> a > 1)
+        |> String.fromInt
 
 
+partTwo : String
 partTwo =
     findUniqueRectangle input matrixSolution
+        |> String.fromInt
 
 
 findUniqueRectangle : List Rectangle -> Matrix Int -> Int
