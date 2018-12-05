@@ -1,7 +1,7 @@
 module DayOne exposing (partOne, partTwo)
 
 import Array exposing (Array)
-import DayOneInput exposing (input)
+import DayOne.Input exposing (input)
 import Set exposing (Set)
 
 

@@ -1,4 +1,4 @@
-module DayFourInput exposing (Action(..), Date, Event, Guard, Status(..), debugInput, input)
+module DayFour.Input exposing (Action(..), Date, Event, Guard, Status(..), debugInput, input)
 
 import Dict
 import Parser exposing ((|.), (|=), Parser, andThen, end, int, keyword, map, number, oneOf, run, spaces, succeed, symbol)
@@ -29,7 +29,13 @@ type alias Guard =
 
 input : List Event
 input =
-    Result.withDefault [] (run eventListParser rawInput)
+    rawInput
+        |> String.split "\n"
+        |> List.sort
+        |> List.filterMap
+            (run eventParser
+                >> Result.toMaybe
+            )
 
 
 debugInput : String
@@ -41,20 +47,23 @@ debugInput =
 
 eventString : Event -> String
 eventString event =
-    actionString event.action ++ " @ " ++ dateString event.date
+    dateString event.date ++ "\t" ++ actionString event.action
 
 
 dateString : Date -> String
 dateString date =
-    String.fromInt date.year
-        ++ "/"
-        ++ String.fromInt date.month
-        ++ "/"
-        ++ String.fromInt date.day
-        ++ " "
-        ++ String.fromInt date.hour
+    -- String.fromInt date.year
+    --     ++ "/" ++
+    String.padLeft 5
+        ' '
+        (String.fromInt date.month
+            ++ "/"
+            ++ String.fromInt date.day
+        )
+        ++ " @ "
+        ++ String.padLeft 2 '0' (String.fromInt date.hour)
         ++ ":"
-        ++ String.fromInt date.minute
+        ++ String.padLeft 2 '0' (String.fromInt date.minute)
 
 
 actionString : Action -> String

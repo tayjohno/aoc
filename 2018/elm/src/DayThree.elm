@@ -1,7 +1,7 @@
 module DayThree exposing (addRectangles, partOne, partTwo)
 
 import Array
-import DayThreeInput exposing (Dimensions, Rectangle, input)
+import DayThree.Input exposing (Dimensions, Rectangle, input)
 import DynamicMatrix exposing (Coordinate, Matrix, get, set, transformElement)
 
 

@@ -1,6 +1,6 @@
 module DayTwo exposing (partOne, partTwo)
 
-import DayTwoInput exposing (input)
+import DayTwo.Input exposing (input)
 import Dict exposing (Dict)
 
 

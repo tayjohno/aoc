@@ -1,4 +1,4 @@
-module DayTwoInput exposing (input)
+module DayTwo.Input exposing (input)
 
 
 input : List String

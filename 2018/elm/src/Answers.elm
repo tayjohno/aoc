@@ -1,6 +1,6 @@
 module Answers exposing (main)
 
-import DayFourInput
+import DayFour.Input
 import DayOne
 import DayThree
 import DayTwo
@@ -18,7 +18,7 @@ main =
         [ dayDiv "December One" (Just DayOne.partOne) (Just DayOne.partTwo) Nothing
         , dayDiv "December Two" (Just DayTwo.partOne) (Just DayTwo.partTwo) Nothing
         , dayDiv "December Three" (Just DayThree.partOne) (Just DayThree.partTwo) Nothing
-        , dayDiv "December Four" Nothing Nothing (Just DayFourInput.debugInput)
+        , dayDiv "December Four" Nothing Nothing (Just DayFour.Input.debugInput)
         , dayDiv "December Five" Nothing Nothing Nothing
         , dayDiv "December Six" Nothing Nothing Nothing
         , dayDiv "December Seven" Nothing Nothing Nothing
