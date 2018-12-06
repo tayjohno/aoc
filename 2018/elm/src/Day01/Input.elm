@@ -1,4 +1,4 @@
-module DayOne.Input exposing (input)
+module Day01.Input exposing (input)
 
 
 input : List Int

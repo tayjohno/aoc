@@ -1,12 +1,7 @@
-module DayFour.Input exposing (Action(..), Date, Event, Guard, Status(..), debugInput, input)
+module Day04.Input exposing (Action(..), Date, Event, Guard, debugInput, input)
 
 import Dict
 import Parser exposing ((|.), (|=), Parser, andThen, end, int, keyword, map, number, oneOf, run, spaces, succeed, symbol)
-
-
-type Status
-    = Awake
-    | Asleep
 
 
 type alias Event =

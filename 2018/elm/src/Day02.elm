@@ -1,10 +1,10 @@
-module DayTwo exposing (partOne, partTwo)
+module Day02 exposing (partOne, partTwo)
 
-import DayTwo.Input exposing (input)
+import Day02.Input exposing (input)
 import Dict exposing (Dict)
 
 
-partOne : String
+partOne : Maybe String
 partOne =
     let
         checksumParts =
@@ -20,6 +20,7 @@ partOne =
     in
     (twos * threes)
         |> String.fromInt
+        |> Just
 
 
 checksumTuple : String -> ( Int, Int )
@@ -71,9 +72,10 @@ letterCountsIterator chars dictionary =
                 )
 
 
-partTwo : String
+partTwo : Maybe String
 partTwo =
     idMatchFinder input
+        |> Just
 
 
 idMatchFinder : List String -> String

@@ -1,4 +1,4 @@
-module DayThree.Input exposing (Dimensions, Rectangle, input)
+module Day03.Input exposing (Dimensions, Rectangle, input)
 
 import DynamicMatrix exposing (Coordinate)
 import Parser exposing (..)

@@ -1,7 +1,7 @@
-module DayOne exposing (partOne, partTwo)
+module Day01 exposing (partOne, partTwo)
 
 import Array exposing (Array)
-import DayOne.Input exposing (input)
+import Day01.Input exposing (input)
 import Set exposing (Set)
 
 
@@ -17,14 +17,15 @@ nextCycle ( index, array ) =
             )
 
 
-partOne : String
+partOne : Maybe String
 partOne =
     input
         |> List.foldl (+) 0
         |> String.fromInt
+        |> Just
 
 
-partTwo : String
+partTwo : Maybe String
 partTwo =
     problemTwoStep 0
         Set.empty
@@ -33,6 +34,7 @@ partTwo =
             |> Array.fromList
         )
         |> String.fromInt
+        |> Just
 
 
 problemTwoStep : Int -> Set Int -> ( Int, Array Int ) -> Int
