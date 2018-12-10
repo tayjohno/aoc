@@ -4,7 +4,8 @@ import Day01
 import Day02
 import Day03
 import Day04
-import Day04.Input
+import Day05
+import Day06
 import Html exposing (Html, div, h2, h3, p, span, text, textarea)
 import Html.Attributes exposing (attribute, class, style)
 import Html.Lazy exposing (lazy, lazy2, lazy3)
@@ -19,9 +20,9 @@ main =
         [ dayDiv "December One" Day01.partOne Day01.partTwo Nothing
         , dayDiv "December Two" Day02.partOne Day02.partTwo Nothing
         , dayDiv "December Three" Day03.partOne Day03.partTwo Nothing
-        , dayDiv "December Four" Day04.partOne Day04.partTwo (Just Day04.Input.debugInput)
-        , dayDiv "December Five" Nothing Nothing Nothing
-        , dayDiv "December Six" Nothing Nothing Nothing
+        , dayDiv "December Four" Day04.partOne Day04.partTwo Nothing
+        , dayDiv "December Five" Day05.partOne Day05.partTwo Nothing
+        , dayDiv "December Six" Day06.partOne Day06.partTwo Day06.debug
         , dayDiv "December Seven" Nothing Nothing Nothing
         , dayDiv "December Eight" Nothing Nothing Nothing
         , dayDiv "December Nine" Nothing Nothing Nothing
@@ -48,7 +49,12 @@ main =
 dayDiv : String -> Maybe String -> Maybe String -> Maybe String -> Html msg
 dayDiv dayString partOneString partTwoString debugString =
     div
-        [ class "day-wrapper" ]
+        (if debugString == Nothing then
+            [ class "day-wrapper" ]
+
+         else
+            [ class "day-wrapper", class "debug" ]
+        )
         [ div
             [ class "heading-wrapper" ]
             [ h2 [] [ text dayString ] ]

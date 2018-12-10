@@ -131,7 +131,6 @@ sleepiestHour guard =
                     )
                     array
             )
-        |> Debug.log "simplified"
         |> List.foldl addArrays (Array.repeat 60 0)
         |> indexOfLargest
 
@@ -198,11 +197,8 @@ partTwo : Maybe String
 partTwo =
     allGuards
         |> List.map (\g -> ( g, sleepiestHour g ))
-        |> Debug.log "before sort"
         |> List.sortBy (\data -> -(data |> Tuple.second |> Tuple.second))
-        |> Debug.log "after sort"
         |> List.head
-        |> Debug.log "?"
         |> Maybe.withDefault ( 0, ( 0, 0 ) )
         |> (\( g, ( h, c ) ) -> g * h)
         |> String.fromInt

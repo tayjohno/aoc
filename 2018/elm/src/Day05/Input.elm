@@ -5,15 +5,13 @@ import Parser exposing ((|.), (|=), Parser, end, keyword, oneOf, succeed, symbol
 
 
 -- pairCrusher : Parser String
-
-
-pairCrusher =
-    succeed identity
-        oneOf
-        [ matchedPair
-        , letter
-        , end
-        ]
+-- pairCrusher =
+--     succeed identity
+--         oneOf
+--         [ matchedPair
+--         , letter
+--         , end
+--         ]
 
 
 matchedPair : Parser ()

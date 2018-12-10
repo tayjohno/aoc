@@ -1,0 +1,88 @@
+module Day05 exposing (partOne, partTwo)
+
+import Char exposing (Char)
+import Day05.Input exposing (input)
+
+
+
+-- 90 seconds
+
+
+partOne =
+    input
+        |> String.toList
+        |> partOneHelper
+        |> List.length
+        |> String.fromInt
+        |> Just
+
+
+partOneHelper : List Char -> List Char
+partOneHelper originalList =
+    let
+        startLength =
+            List.length originalList
+
+        newList =
+            duplicateRemover [] originalList
+    in
+    if List.length newList < List.length originalList then
+        partOneHelper newList
+
+    else
+        newList
+
+
+duplicateRemover : List Char -> List Char -> List Char
+duplicateRemover outputList inputList =
+    case inputList of
+        c1 :: c2 :: rest ->
+            if c1 /= c2 && Char.toLower c1 == Char.toLower c2 then
+                -- remove the duplicate and take one step BACKWARDS if possible
+                case outputList of
+                    lastOutput :: others ->
+                        duplicateRemover others (lastOutput :: rest)
+
+                    _ ->
+                        duplicateRemover outputList rest
+
+            else
+                duplicateRemover (c1 :: outputList) (c2 :: rest)
+
+        _ ->
+            List.append (List.reverse outputList) inputList
+
+
+partTwo =
+    let
+        refinedInput : String
+        refinedInput =
+            input
+                |> String.toList
+                |> partOneHelper
+                |> String.fromList
+    in
+    letters
+        |> List.map
+            (\letter ->
+                refinedInput
+                    |> String.replace (String.fromChar letter) ""
+                    |> String.replace (String.fromChar (Char.toUpper letter)) ""
+                    |> String.toList
+                    |> partOneHelper
+                    |> List.length
+            )
+        |> List.sort
+        |> List.head
+        |> (\i ->
+                case i of
+                    Nothing ->
+                        Nothing
+
+                    Just int ->
+                        Just (String.fromInt int)
+           )
+
+
+letters =
+    String.toList "abcdefghijklmnopqrstuvwxyz"
