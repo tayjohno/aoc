@@ -7,6 +7,7 @@ import Day04
 import Day05
 import Day06
 import Day07
+import Day08
 import Html exposing (Html, div, h2, h3, p, span, text, textarea)
 import Html.Attributes exposing (attribute, class, style)
 import Html.Lazy exposing (lazy, lazy2, lazy3)
