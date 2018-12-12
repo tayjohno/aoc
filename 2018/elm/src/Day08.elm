@@ -22,21 +22,57 @@ partOne =
 
 readNodes : Int -> List Int -> ( List MetadataNode, List Int )
 readNodes n intList =
-    ( [ Node [] [] ], [] )
+    if n == 0 then
+        ( [], intList )
+
+    else
+        let
+            ( nextNode, remainingList ) =
+                readNode intList
+
+            ( otherNodes, finalList ) =
+                readNodes (n - 1) remainingList
+        in
+        ( nextNode :: otherNodes, finalList )
 
 
 readNode : List Int -> ( MetadataNode, List Int )
 readNode intList =
-    let
-        childLength =
-            List.head intList
+    case intList of
+        childLength :: metaLength :: remainderInput ->
+            let
+                ( childNodes, remainderOutput ) =
+                    readNodes childLength remainderInput
+            in
+            ( Node childNodes (List.take metaLength remainderOutput), List.drop metaLength remainderOutput )
 
-        metaLength =
-            List.head (Maybe.withDefault [] (List.tail intList))
-    in
-    ( Node [] [], [] )
+        _ ->
+            Debug.todo "Oops!"
 
 
 partTwo : Maybe String
 partTwo =
-    Nothing
+    readNode input
+        |> Tuple.first
+        |> nodeValue
+        |> String.fromInt
+        |> Just
+
+
+nodeValue : MetadataNode -> Int
+nodeValue (Node children metadata) =
+    if children == [] then
+        metadata
+            |> List.foldl (+) 0
+
+    else
+        metadata
+            |> List.filterMap (\a -> atIndex (a - 1) children)
+            |> List.map nodeValue
+            |> List.foldl (+) 0
+
+
+atIndex : Int -> List a -> Maybe a
+atIndex i =
+    List.drop i
+        >> List.head

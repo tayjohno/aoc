@@ -1,8 +1,8 @@
 module Day08.Node exposing (Node(..), children, data, flatten)
 
 
-type Node a
-    = Node (List (Node a)) a
+type Node data
+    = Node (List (Node data)) data
 
 
 flatten : Node a -> List (Node a)

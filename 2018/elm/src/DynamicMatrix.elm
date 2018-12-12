@@ -136,7 +136,7 @@ printLines index matrix =
         nextRow =
             Array.slice (index * matrix.size) ((index + 1) * matrix.size) matrix.data
     in
-    if Array.length nextRow > 0 && Array.length (Debug.log "" nextRow) > 0 then
+    if Array.length nextRow > 0 && Array.length nextRow > 0 then
         printLines (index + 1) matrix
 
     else

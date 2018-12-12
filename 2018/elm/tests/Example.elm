@@ -7,6 +7,7 @@ import Day04
 import Day05
 import Day06
 import Day07
+import Day08
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Test exposing (..)
@@ -76,5 +77,14 @@ suite =
             , test "partTwo" <|
                 \_ ->
                     Expect.equal (Just "967") Day07.partTwo
+            ]
+        , describe
+            "Day08"
+            [ test "partOne" <|
+                \_ ->
+                    Expect.equal (Just "42254") Day08.partOne
+            , test "partTwo" <|
+                \_ ->
+                    Expect.equal (Just "25007") Day08.partTwo
             ]
         ]

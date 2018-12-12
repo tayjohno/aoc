@@ -124,7 +124,6 @@ partOne =
     regions
         |> List.map (\region -> ( region, regionSize fullMap region ))
         |> List.sortBy Tuple.second
-        |> Debug.log "list"
         |> List.reverse
         |> List.head
         |> (\a ->
@@ -189,7 +188,7 @@ updateMapHelper stillUnclaimed unchecked newMatrix oldMatrix =
             -- Another Pass
             let
                 stillUnclaimedLength =
-                    Debug.log "unclaimed" (List.length stillUnclaimed)
+                    List.length stillUnclaimed
             in
             updateMapHelper [] stillUnclaimed newMatrix newMatrix
 
@@ -258,7 +257,6 @@ partTwo =
     in
     allCoordsList
         |> List.map (\c1 -> List.foldl (\c2 sum -> distanceBetween c1 c2 + sum) 0 startingPointsList)
-        |> Debug.log "unfiltered"
         |> List.filter ((>) 10000)
         |> List.length
         |> String.fromInt

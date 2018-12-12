@@ -26,7 +26,7 @@ main =
         , dayDiv "December Five" Day05.partOne Day05.partTwo Nothing
         , dayDiv "December Six" Day06.partOne Day06.partTwo Nothing
         , dayDiv "December Seven" Day07.partOne Day07.partTwo Nothing
-        , dayDiv "December Eight" Nothing Nothing Nothing
+        , dayDiv "December Eight" Day08.partOne Day08.partTwo Nothing
         , dayDiv "December Nine" Nothing Nothing Nothing
         , dayDiv "December Ten" Nothing Nothing Nothing
         , dayDiv "December Eleven" Nothing Nothing Nothing
