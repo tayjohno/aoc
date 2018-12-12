@@ -1,7 +1,8 @@
-module Day06 exposing (debug, partOne, partTwo)
+module Day06 exposing (partOne, partTwo)
 
 import Array exposing (Array)
 import Day06.Input exposing (input)
+import List.Unique
 import Matrix exposing (..)
 
 
@@ -19,6 +20,7 @@ debug : Maybe String
 debug =
     emptyBestFitMatrix input
         |> addStartingPoints input
+        |> (\matrix -> updateMap (allCoordinates matrix) matrix)
         |> Matrix.toString claimStatusChar
         |> Just
 
@@ -36,6 +38,66 @@ claimStatusChar claimStatus =
             ' '
 
 
+uniqueRegions : Matrix ClaimStatus -> List Region
+uniqueRegions matrix =
+    matrix.data
+        |> Array.toList
+        |> List.Unique.fromList
+        |> List.Unique.toList
+        |> List.filterMap
+            (\claim ->
+                case claim of
+                    Claimed a ->
+                        Just a
+
+                    _ ->
+                        Nothing
+            )
+
+
+surroundedRegions : Matrix ClaimStatus -> List Region
+surroundedRegions matrix =
+    let
+        borderRegionsList =
+            borderRegions matrix
+    in
+    uniqueRegions matrix
+        |> List.filter (\region -> not (List.member region borderRegionsList))
+
+
+borderCoordinates : Matrix ClaimStatus -> List Coordinate
+borderCoordinates matrix =
+    let
+        ( width, height ) =
+            matrix.size
+    in
+    Matrix.allCoordinates matrix
+        |> List.filter (\( x, y ) -> x == 0 || y == 0 || x == width - 1 || y == height - 1)
+
+
+borderRegions : Matrix ClaimStatus -> List Region
+borderRegions matrix =
+    borderCoordinates matrix
+        |> List.filterMap
+            (\coord ->
+                case Matrix.get coord matrix of
+                    Just (Claimed region) ->
+                        Just region
+
+                    _ ->
+                        Nothing
+            )
+        |> List.Unique.fromList
+        |> List.Unique.toList
+
+
+regionSize : Matrix ClaimStatus -> Region -> Int
+regionSize matrix region =
+    matrix.data
+        |> Array.filter (\a -> a == Claimed region)
+        |> Array.length
+
+
 intToChar : Int -> Char
 intToChar int =
     let
@@ -49,7 +111,33 @@ intToChar int =
 
 partOne : Maybe String
 partOne =
-    Nothing
+    let
+        fullMap =
+            emptyBestFitMatrix input
+                |> addStartingPoints input
+                |> (\matrix -> updateMap (allCoordinates matrix) matrix)
+
+        regions =
+            fullMap
+                |> surroundedRegions
+    in
+    regions
+        |> List.map (\region -> ( region, regionSize fullMap region ))
+        |> List.sortBy Tuple.second
+        |> Debug.log "list"
+        |> List.reverse
+        |> List.head
+        |> (\a ->
+                case a of
+                    Just tuple ->
+                        tuple
+                            |> Tuple.second
+                            |> String.fromInt
+                            |> Just
+
+                    Nothing ->
+                        Nothing
+           )
 
 
 emptyBestFitMatrix : List Coordinate -> Matrix ClaimStatus
@@ -87,33 +175,66 @@ addStartingPointsHelper index coordinateList matrix =
 
 updateMap : List Coordinate -> Matrix ClaimStatus -> Matrix ClaimStatus
 updateMap list matrix =
-    updateMapHelper list matrix matrix
+    updateMapHelper [] list matrix matrix
 
 
 updateMapHelper : List Coordinate -> List Coordinate -> Matrix ClaimStatus -> Matrix ClaimStatus -> Matrix ClaimStatus
-updateMapHelper checked unchecked newMatrix oldMatrix =
-    case ( checked, unchecked ) of
+updateMapHelper stillUnclaimed unchecked newMatrix oldMatrix =
+    case ( stillUnclaimed, unchecked ) of
         ( [], [] ) ->
             -- Finished
             newMatrix
 
         ( _, [] ) ->
             -- Another Pass
-            updateMapHelper [] checked newMatrix newMatrix
+            let
+                stillUnclaimedLength =
+                    Debug.log "unclaimed" (List.length stillUnclaimed)
+            in
+            updateMapHelper [] stillUnclaimed newMatrix newMatrix
 
         ( _, head :: tail ) ->
             case Maybe.withDefault Unclaimed (Matrix.get head oldMatrix) of
                 Unclaimed ->
-                    if Debug.todo "Can Claim" then
-                        Debug.todo "Claim"
-                            Debug.todo
-                            "Remove from Queue"
+                    case checkNeighbors head oldMatrix of
+                        Unclaimed ->
+                            updateMapHelper (head :: stillUnclaimed) tail newMatrix oldMatrix
 
-                    else
-                        Debug.todo "Move to back of queue"
+                        status ->
+                            updateMapHelper stillUnclaimed tail (Matrix.set head status newMatrix) oldMatrix
 
                 _ ->
-                    updateMapHelper checked tail newMatrix oldMatrix
+                    -- was already claimed, remove from set.
+                    updateMapHelper stillUnclaimed tail newMatrix oldMatrix
+
+
+checkNeighbors : Coordinate -> Matrix ClaimStatus -> ClaimStatus
+checkNeighbors coordinate matrix =
+    let
+        neighborClaims =
+            neighbors coordinate
+                |> List.filterMap (\coord -> Matrix.get coord matrix)
+                |> List.filterMap
+                    -- Remove unclaimed
+                    (\status ->
+                        if status == Unclaimed then
+                            Nothing
+
+                        else
+                            Just status
+                    )
+                |> List.Unique.fromList
+                |> List.Unique.toList
+    in
+    case neighborClaims of
+        [] ->
+            Unclaimed
+
+        [ Claimed a ] ->
+            Claimed a
+
+        _ ->
+            Contested
 
 
 neighbors : Coordinate -> List Coordinate
@@ -121,6 +242,24 @@ neighbors ( x, y ) =
     [ ( x - 1, y ), ( x + 1, y ), ( x, y - 1 ), ( x, y + 1 ) ]
 
 
+distanceBetween : Coordinate -> Coordinate -> Int
+distanceBetween ( x1, y1 ) ( x2, y2 ) =
+    abs (x1 - x2) + abs (y1 - y2)
+
+
 partTwo : Maybe String
 partTwo =
-    Nothing
+    let
+        startingPointsList =
+            input
+
+        allCoordsList =
+            Matrix.allCoordinates (emptyBestFitMatrix input)
+    in
+    allCoordsList
+        |> List.map (\c1 -> List.foldl (\c2 sum -> distanceBetween c1 c2 + sum) 0 startingPointsList)
+        |> Debug.log "unfiltered"
+        |> List.filter ((>) 10000)
+        |> List.length
+        |> String.fromInt
+        |> Just

@@ -1,4 +1,4 @@
-module Day04 exposing (SleepLog, SleepLogEntry, Status(..), addArrays, addLists, buildSleepLog, buildSleepLogEntry, buildSleepLogEntryHelper, countWhere, eventsThisShift, indexOfLargest, laziestElf, partOne, partTwo, sleepiestHour)
+module Day04 exposing (partOne, partTwo)
 
 import Array exposing (Array)
 import Day04.Input exposing (Action(..), Date, Event, Guard, input)

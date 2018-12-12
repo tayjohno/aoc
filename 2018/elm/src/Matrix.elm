@@ -1,4 +1,4 @@
-module Matrix exposing (Coordinate, Matrix, Size, allCoordinates, empty, get, prettyPrint, printLines, set, toRows, toString, transformElement)
+module Matrix exposing (Coordinate, Matrix, Size, allCoordinates, allCoordinatesHelper, empty, get, set, toRows, toString, transformElement)
 
 import Array exposing (Array)
 
@@ -98,13 +98,13 @@ allCoordinatesHelper index ( width, height ) =
         List.append (List.map (\a -> ( a, index )) (List.range 0 (width - 1))) (allCoordinatesHelper (index + 1) ( width, height ))
 
 
-
--- PRIVATE METHODS
-
-
 toString : (a -> Char) -> Matrix a -> String
 toString coersion matrix =
     toStringHelper coersion (toRows matrix)
+
+
+
+-- PRIVATE METHODS
 
 
 toStringHelper : (a -> Char) -> List (List a) -> String

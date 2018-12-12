@@ -1,4 +1,4 @@
-module Day03 exposing (addRectangles, partOne, partTwo)
+module Day03 exposing (partOne, partTwo)
 
 import Array
 import Day03.Input exposing (Dimensions, Rectangle, input)

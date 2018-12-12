@@ -6,6 +6,7 @@ import Day03
 import Day04
 import Day05
 import Day06
+import Day07
 import Html exposing (Html, div, h2, h3, p, span, text, textarea)
 import Html.Attributes exposing (attribute, class, style)
 import Html.Lazy exposing (lazy, lazy2, lazy3)
@@ -22,8 +23,8 @@ main =
         , dayDiv "December Three" Day03.partOne Day03.partTwo Nothing
         , dayDiv "December Four" Day04.partOne Day04.partTwo Nothing
         , dayDiv "December Five" Day05.partOne Day05.partTwo Nothing
-        , dayDiv "December Six" Day06.partOne Day06.partTwo Day06.debug
-        , dayDiv "December Seven" Nothing Nothing Nothing
+        , dayDiv "December Six" Day06.partOne Day06.partTwo Nothing
+        , dayDiv "December Seven" Day07.partOne Day07.partTwo Nothing
         , dayDiv "December Eight" Nothing Nothing Nothing
         , dayDiv "December Nine" Nothing Nothing Nothing
         , dayDiv "December Ten" Nothing Nothing Nothing
