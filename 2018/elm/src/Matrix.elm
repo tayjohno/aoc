@@ -1,4 +1,4 @@
-module Matrix exposing (Coordinate, Matrix, Size, allCoordinates, allCoordinatesHelper, empty, get, set, toRows, toString, transformElement)
+module Matrix exposing (Coordinate, Matrix, Size, allCoordinates, allCoordinatesHelper, empty, get, prettyPrint, set, toRows, toString, transformElement)
 
 import Array exposing (Array)
 
@@ -139,8 +139,9 @@ printLines index matrix =
 
         nextRow =
             Array.slice (index * width) ((index + 1) * width) matrix.data
+                |> Debug.log ""
     in
-    if height > 0 then
+    if height > index then
         printLines (index + 1) matrix
 
     else

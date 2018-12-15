@@ -87,4 +87,13 @@ suite =
                 \_ ->
                     Expect.equal (Just "25007") Day08.partTwo
             ]
+        , describe
+            "Day09"
+            [ test "partOne" <|
+                \_ ->
+                    Expect.equal (Just "410375") Day08.partOne
+            , test "partTwo" <|
+                \_ ->
+                    Expect.equal (Just "") Day08.partTwo
+            ]
         ]
