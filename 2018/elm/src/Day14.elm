@@ -7,6 +7,11 @@ input =
     633601
 
 
-partOne : Array Int
+partOne : Array (Maybe Int)
 partOne =
-    Array.initialize (always 0)
+    Array.initialize input (always Nothing)
+
+
+partTwo : () -> Maybe String
+partTwo =
+    Nothing

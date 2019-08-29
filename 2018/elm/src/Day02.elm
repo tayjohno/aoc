@@ -4,23 +4,31 @@ import Day02.Input exposing (input)
 import Dict exposing (Dict)
 
 
-partOne : Maybe String
+partOne : () -> Maybe String
 partOne =
-    let
-        checksumParts =
-            input
-                |> List.map checksumTuple
-                |> List.unzip
+    \_ ->
+        let
+            checksumParts =
+                input
+                    |> List.map checksumTuple
+                    |> List.unzip
 
-        twos =
-            sum (Tuple.first checksumParts)
+            twos =
+                sum (Tuple.first checksumParts)
 
-        threes =
-            sum (Tuple.second checksumParts)
-    in
-    (twos * threes)
-        |> String.fromInt
-        |> Just
+            threes =
+                sum (Tuple.second checksumParts)
+        in
+        (twos * threes)
+            |> String.fromInt
+            |> Just
+
+
+partTwo : () -> Maybe String
+partTwo =
+    \_ ->
+        idMatchFinder input
+            |> Just
 
 
 checksumTuple : String -> ( Int, Int )
@@ -70,12 +78,6 @@ letterCountsIterator chars dictionary =
                     (Maybe.withDefault 0 (Dict.get char dictionary) + 1)
                     dictionary
                 )
-
-
-partTwo : Maybe String
-partTwo =
-    idMatchFinder input
-        |> Just
 
 
 idMatchFinder : List String -> String

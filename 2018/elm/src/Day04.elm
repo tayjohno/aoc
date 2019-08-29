@@ -19,6 +19,35 @@ type alias SleepLog =
     List SleepLogEntry
 
 
+partOne : () -> Maybe String
+partOne =
+    \_ ->
+        let
+            guard =
+                laziestElf
+
+            hour =
+                Tuple.first (sleepiestHour guard)
+        in
+        guard
+            * hour
+            |> String.fromInt
+            |> Just
+
+
+partTwo : () -> Maybe String
+partTwo =
+    \_ ->
+        allGuards
+            |> List.map (\g -> ( g, sleepiestHour g ))
+            |> List.sortBy (\data -> -(data |> Tuple.second |> Tuple.second))
+            |> List.head
+            |> Maybe.withDefault ( 0, ( 0, 0 ) )
+            |> (\( g, ( h, c ) ) -> g * h)
+            |> String.fromInt
+            |> Just
+
+
 buildSleepLog : List Event -> SleepLog
 buildSleepLog eventList =
     case eventList of
@@ -172,34 +201,3 @@ allGuards =
         |> List.map (\entry -> entry.guard)
         |> Set.fromList
         |> Set.toList
-
-
-partOne : Maybe String
-partOne =
-    let
-        guard =
-            laziestElf
-
-        hour =
-            Tuple.first (sleepiestHour guard)
-    in
-    guard
-        * hour
-        |> String.fromInt
-        |> Just
-
-
-
--- |> Dict.fromList
-
-
-partTwo : Maybe String
-partTwo =
-    allGuards
-        |> List.map (\g -> ( g, sleepiestHour g ))
-        |> List.sortBy (\data -> -(data |> Tuple.second |> Tuple.second))
-        |> List.head
-        |> Maybe.withDefault ( 0, ( 0, 0 ) )
-        |> (\( g, ( h, c ) ) -> g * h)
-        |> String.fromInt
-        |> Just

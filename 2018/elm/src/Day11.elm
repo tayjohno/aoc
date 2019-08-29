@@ -8,12 +8,26 @@ input =
     1308
 
 
+partOne : () -> Maybe String
 partOne =
-    let
-        matrix =
-            mapCoordinates (calculateScore input) empty
-    in
-    partOneHelper ( 0, 0 ) matrix Nothing
+    \_ ->
+        let
+            matrix =
+                mapCoordinates (calculateScore input) empty
+        in
+        partOneHelper ( 0, 0 ) matrix Nothing
+            |> Maybe.andThen (toString >> Just)
+
+
+partTwo : () -> Maybe String
+partTwo =
+    \_ ->
+        Nothing
+
+
+toString : Coordinate -> String
+toString ( x, y ) =
+    String.fromInt x ++ "," ++ String.fromInt y
 
 
 partOneHelper : Coordinate -> Matrix Int -> Maybe ( Int, Coordinate ) -> Maybe Coordinate
@@ -127,11 +141,6 @@ calculateScore offset ( x, y ) =
         ((((x + 10) * y) + offset) * (x + 10))
         // 100
         - 5
-
-
-partTwo : Maybe String
-partTwo =
-    Nothing
 
 
 empty : Matrix Int

@@ -5,20 +5,22 @@ import Day03.Input exposing (Dimensions, Rectangle, input)
 import DynamicMatrix exposing (Coordinate, Matrix, get, set, transformElement)
 
 
-partOne : Maybe String
+partOne : () -> Maybe String
 partOne =
-    matrixSolution.data
-        |> Array.toList
-        |> countWhere 0 (\a -> a > 1)
-        |> String.fromInt
-        |> Just
+    \_ ->
+        matrixSolution.data
+            |> Array.toList
+            |> countWhere 0 (\a -> a > 1)
+            |> String.fromInt
+            |> Just
 
 
-partTwo : Maybe String
+partTwo : () -> Maybe String
 partTwo =
-    findUniqueRectangle input matrixSolution
-        |> String.fromInt
-        |> Just
+    \_ ->
+        findUniqueRectangle input matrixSolution
+            |> String.fromInt
+            |> Just
 
 
 findUniqueRectangle : List Rectangle -> Matrix Int -> Int

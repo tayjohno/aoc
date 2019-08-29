@@ -5,6 +5,28 @@ import Day01.Input exposing (input)
 import Set exposing (Set)
 
 
+partOne : () -> Maybe String
+partOne =
+    \_ ->
+        input
+            |> List.foldl (+) 0
+            |> String.fromInt
+            |> Just
+
+
+partTwo : () -> Maybe String
+partTwo =
+    \_ ->
+        problemTwoStep 0
+            Set.empty
+            ( 0
+            , input
+                |> Array.fromList
+            )
+            |> String.fromInt
+            |> Just
+
+
 nextCycle : ( Int, Array a ) -> ( Maybe a, ( Int, Array a ) )
 nextCycle ( index, array ) =
     case Array.get index array of
@@ -15,26 +37,6 @@ nextCycle ( index, array ) =
             ( Array.get 0 array
             , ( 1, array )
             )
-
-
-partOne : Maybe String
-partOne =
-    input
-        |> List.foldl (+) 0
-        |> String.fromInt
-        |> Just
-
-
-partTwo : Maybe String
-partTwo =
-    problemTwoStep 0
-        Set.empty
-        ( 0
-        , input
-            |> Array.fromList
-        )
-        |> String.fromInt
-        |> Just
 
 
 problemTwoStep : Int -> Set Int -> ( Int, Array Int ) -> Int

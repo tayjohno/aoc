@@ -4,17 +4,48 @@ import Char exposing (Char)
 import Day05.Input exposing (input)
 
 
-
--- 90 seconds
-
-
+partOne : () -> Maybe String
 partOne =
-    input
-        |> String.toList
-        |> partOneHelper
-        |> List.length
-        |> String.fromInt
-        |> Just
+    \_ ->
+        input
+            |> String.toList
+            |> partOneHelper
+            |> List.length
+            |> String.fromInt
+            |> Just
+
+
+partTwo : () -> Maybe String
+partTwo =
+    \_ ->
+        let
+            refinedInput : String
+            refinedInput =
+                input
+                    |> String.toList
+                    |> partOneHelper
+                    |> String.fromList
+        in
+        letters
+            |> List.map
+                (\letter ->
+                    refinedInput
+                        |> String.replace (String.fromChar letter) ""
+                        |> String.replace (String.fromChar (Char.toUpper letter)) ""
+                        |> String.toList
+                        |> partOneHelper
+                        |> List.length
+                )
+            |> List.sort
+            |> List.head
+            |> (\i ->
+                    case i of
+                        Nothing ->
+                            Nothing
+
+                        Just int ->
+                            Just (String.fromInt int)
+               )
 
 
 partOneHelper : List Char -> List Char
@@ -51,37 +82,6 @@ duplicateRemover outputList inputList =
 
         _ ->
             List.append (List.reverse outputList) inputList
-
-
-partTwo =
-    let
-        refinedInput : String
-        refinedInput =
-            input
-                |> String.toList
-                |> partOneHelper
-                |> String.fromList
-    in
-    letters
-        |> List.map
-            (\letter ->
-                refinedInput
-                    |> String.replace (String.fromChar letter) ""
-                    |> String.replace (String.fromChar (Char.toUpper letter)) ""
-                    |> String.toList
-                    |> partOneHelper
-                    |> List.length
-            )
-        |> List.sort
-        |> List.head
-        |> (\i ->
-                case i of
-                    Nothing ->
-                        Nothing
-
-                    Just int ->
-                        Just (String.fromInt int)
-           )
 
 
 letters =

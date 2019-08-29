@@ -4,16 +4,18 @@ import Day07.DataTypes exposing (Prerequisite)
 import Day07.Input exposing (input)
 
 
-partOne : Maybe String
+partOne : () -> Maybe String
 partOne =
-    Just (partOneHelper alphabet input)
+    \_ ->
+        Just (partOneHelper alphabet input)
 
 
-partTwo : Maybe String
+partTwo : () -> Maybe String
 partTwo =
-    partTwoHelper 0 alphabet input []
-        |> String.fromInt
-        |> Just
+    \_ ->
+        partTwoHelper 0 alphabet input []
+            |> String.fromInt
+            |> Just
 
 
 type alias Worker =

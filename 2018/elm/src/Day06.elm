@@ -16,6 +16,55 @@ type alias Region =
     Int
 
 
+partOne : () -> Maybe String
+partOne =
+    \_ ->
+        let
+            fullMap =
+                emptyBestFitMatrix input
+                    |> addStartingPoints input
+                    |> (\matrix -> updateMap (allCoordinates matrix) matrix)
+
+            regions =
+                fullMap
+                    |> surroundedRegions
+        in
+        regions
+            |> List.map (\region -> ( region, regionSize fullMap region ))
+            |> List.sortBy Tuple.second
+            |> List.reverse
+            |> List.head
+            |> (\a ->
+                    case a of
+                        Just tuple ->
+                            tuple
+                                |> Tuple.second
+                                |> String.fromInt
+                                |> Just
+
+                        Nothing ->
+                            Nothing
+               )
+
+
+partTwo : () -> Maybe String
+partTwo =
+    \_ ->
+        let
+            startingPointsList =
+                input
+
+            allCoordsList =
+                Matrix.allCoordinates (emptyBestFitMatrix input)
+        in
+        allCoordsList
+            |> List.map (\c1 -> List.foldl (\c2 sum -> distanceBetween c1 c2 + sum) 0 startingPointsList)
+            |> List.filter ((>) 10000)
+            |> List.length
+            |> String.fromInt
+            |> Just
+
+
 debug : Maybe String
 debug =
     emptyBestFitMatrix input
@@ -107,36 +156,6 @@ intToChar int =
                 |> Array.fromList
     in
     Maybe.withDefault '?' (Array.get int characters)
-
-
-partOne : Maybe String
-partOne =
-    let
-        fullMap =
-            emptyBestFitMatrix input
-                |> addStartingPoints input
-                |> (\matrix -> updateMap (allCoordinates matrix) matrix)
-
-        regions =
-            fullMap
-                |> surroundedRegions
-    in
-    regions
-        |> List.map (\region -> ( region, regionSize fullMap region ))
-        |> List.sortBy Tuple.second
-        |> List.reverse
-        |> List.head
-        |> (\a ->
-                case a of
-                    Just tuple ->
-                        tuple
-                            |> Tuple.second
-                            |> String.fromInt
-                            |> Just
-
-                    Nothing ->
-                        Nothing
-           )
 
 
 emptyBestFitMatrix : List Coordinate -> Matrix ClaimStatus
@@ -244,20 +263,3 @@ neighbors ( x, y ) =
 distanceBetween : Coordinate -> Coordinate -> Int
 distanceBetween ( x1, y1 ) ( x2, y2 ) =
     abs (x1 - x2) + abs (y1 - y2)
-
-
-partTwo : Maybe String
-partTwo =
-    let
-        startingPointsList =
-            input
-
-        allCoordsList =
-            Matrix.allCoordinates (emptyBestFitMatrix input)
-    in
-    allCoordsList
-        |> List.map (\c1 -> List.foldl (\c2 sum -> distanceBetween c1 c2 + sum) 0 startingPointsList)
-        |> List.filter ((>) 10000)
-        |> List.length
-        |> String.fromInt
-        |> Just

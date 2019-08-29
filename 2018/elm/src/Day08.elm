@@ -8,16 +8,27 @@ type alias MetadataNode =
     Node (List Int)
 
 
-partOne : Maybe String
+partOne : () -> Maybe String
 partOne =
-    readNode input
-        |> Tuple.first
-        |> Node.flatten
-        |> List.map Node.data
-        |> List.map (List.foldl (+) 0)
-        |> List.foldl (+) 0
-        |> String.fromInt
-        |> Just
+    \_ ->
+        readNode input
+            |> Tuple.first
+            |> Node.flatten
+            |> List.map Node.data
+            |> List.map (List.foldl (+) 0)
+            |> List.foldl (+) 0
+            |> String.fromInt
+            |> Just
+
+
+partTwo : () -> Maybe String
+partTwo =
+    \_ ->
+        readNode input
+            |> Tuple.first
+            |> nodeValue
+            |> String.fromInt
+            |> Just
 
 
 readNodes : Int -> List Int -> ( List MetadataNode, List Int )
@@ -48,15 +59,6 @@ readNode intList =
 
         _ ->
             Debug.todo "Oops!"
-
-
-partTwo : Maybe String
-partTwo =
-    readNode input
-        |> Tuple.first
-        |> nodeValue
-        |> String.fromInt
-        |> Just
 
 
 nodeValue : MetadataNode -> Int
