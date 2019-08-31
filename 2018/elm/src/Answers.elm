@@ -1,5 +1,6 @@
 module Answers exposing (main)
 
+import Browser
 import Day01
 import Day02
 import Day03
@@ -16,239 +17,172 @@ import Html.Lazy exposing (lazy, lazy2, lazy3)
 
 type alias Day =
     { name : String
-    , state : DayState
-    , partOne : () -> Maybe String
-    , partTwo : () -> Maybe String
+    , partOne : SolutionStatus
+    , partTwo : SolutionStatus
     , debugString : Maybe String
     }
 
 
-type DayState
-    = Pending
-    | Loading
-    | Loaded PartState PartState
+type SolutionStatus
+    = Pending (() -> Maybe String)
+    | Solving (() -> Maybe String)
+    | Solved (Maybe String)
 
 
-type PartState
-    = Solved String -- Represents a part that has been solved
-    | Unsolved
+type Msg
+    = Reset
+    | Stuff
+    | Things
+
+
+
+-- MODEL
+
+
+type alias Model =
+    { dayConfiguration : List Day }
+
+
+initialModel =
+    { dayConfiguration = initialConfiguration }
+
+
+newDay : String -> (() -> Maybe String) -> (() -> Maybe String) -> Day
+newDay name partOne partTwo =
+    { name = name
+    , partOne = Pending partOne
+    , partTwo = Pending partTwo
+    , debugString = Nothing
+    }
+
+
+initialConfiguration : List Day
+initialConfiguration =
+    [ newDay "December One" (\_ -> Nothing) (\_ -> Nothing) -- Day01.partOne Day01.partTwo
+    , newDay "December Two" (\_ -> Nothing) (\_ -> Nothing) -- Day02.partOne Day02.partTwo
+    , newDay "December Three" (\_ -> Nothing) (\_ -> Nothing) -- Day03.partOne Day03.partTwo
+    , newDay "December Four" (\_ -> Nothing) (\_ -> Nothing) -- Day04.partOne Day04.partTwo
+    , newDay "December Five" (\_ -> Nothing) (\_ -> Nothing) -- Day05.partOne Day05.partTwo
+    , newDay "December Six" (\_ -> Nothing) (\_ -> Nothing) -- Day06.partOne Day06.partTwo
+    , newDay "December Seven" (\_ -> Nothing) (\_ -> Nothing) -- Day07.partOne Day07.partTwo
+    , newDay "December Eight" (\_ -> Nothing) (\_ -> Nothing) -- Day08.partOne Day08.partTwo
+    , newDay "December Nine" (\_ -> Nothing) (\_ -> Nothing) -- Day09.partOne Day09.partTwo
+    , newDay "December Ten" (\_ -> Nothing) (\_ -> Nothing)
+    , newDay "December Eleven" (\_ -> Nothing) (\_ -> Nothing)
+    , newDay "December Twelve" (\_ -> Nothing) (\_ -> Nothing)
+    , newDay "December Thirteen" (\_ -> Nothing) (\_ -> Nothing)
+    , newDay "December Fourteen" (\_ -> Nothing) (\_ -> Nothing)
+    , newDay "December Fifteen" (\_ -> Nothing) (\_ -> Nothing)
+    , newDay "December Sixteen" (\_ -> Nothing) (\_ -> Nothing)
+    , newDay "December Seventeen" (\_ -> Nothing) (\_ -> Nothing)
+    , newDay "December Eighteen" (\_ -> Nothing) (\_ -> Nothing)
+    , newDay "December Nineteen" (\_ -> Nothing) (\_ -> Nothing)
+    , newDay "December Twenty" (\_ -> Nothing) (\_ -> Nothing)
+    , newDay "December Twenty-One" (\_ -> Nothing) (\_ -> Nothing)
+    , newDay "December Twenty-Two" (\_ -> Nothing) (\_ -> Nothing)
+    , newDay "December Twenty-Three" (\_ -> Nothing) (\_ -> Nothing)
+    , newDay "December Twenty-Four" (\_ -> Nothing) (\_ -> Nothing)
+    , newDay "December Twenty-Five" (\_ -> Nothing) (\_ -> Nothing)
+    ]
 
 
 main =
+    Browser.sandbox
+        { init = initialModel
+        , view = view
+        , update = update
+        }
+
+
+
+-- VIEW
+
+
+view : Model -> Html.Html Msg
+view model =
     div
         [ style "font-family" "Helvetica"
         , style "flex-wrap" "wrap"
         , style "display" "flex"
         ]
-        [ dayDiv
-            { name = "December One"
-            , state = Pending
-            , partOne = Day01.partOne
-            , partTwo = Day01.partTwo
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Two"
-            , state = Pending
-            , partOne = Day02.partOne
-            , partTwo = Day02.partTwo
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Three"
-            , state = Pending
-            , partOne = Day03.partOne
-            , partTwo = Day03.partTwo
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Four"
-            , state = Pending
-            , partOne = Day04.partOne
-            , partTwo = Day04.partTwo
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Five"
-            , state = Pending
-            , partOne = Day05.partOne
-            , partTwo = Day05.partTwo
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Six"
-            , state = Pending
-            , partOne = Day06.partOne
-            , partTwo = Day06.partTwo
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Seven"
-            , state = Pending
-            , partOne = Day07.partOne
-            , partTwo = Day07.partTwo
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Eight"
-            , state = Pending
-            , partOne = Day08.partOne
-            , partTwo = Day08.partTwo
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Nine"
-            , state = Pending
-            , partOne = Day09.partOne
-            , partTwo = Day09.partTwo
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Ten"
-            , state = Pending
-            , partOne = \_ -> Nothing
-            , partTwo = \_ -> Nothing
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Eleven"
-            , state = Pending
-            , partOne = \_ -> Nothing
-            , partTwo = \_ -> Nothing
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Twelve"
-            , state = Pending
-            , partOne = \_ -> Nothing
-            , partTwo = \_ -> Nothing
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Thirteen"
-            , state = Pending
-            , partOne = \_ -> Nothing
-            , partTwo = \_ -> Nothing
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Fourteen"
-            , state = Pending
-            , partOne = \_ -> Nothing
-            , partTwo = \_ -> Nothing
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Fifteen"
-            , state = Pending
-            , partOne = \_ -> Nothing
-            , partTwo = \_ -> Nothing
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Sixteen"
-            , state = Pending
-            , partOne = \_ -> Nothing
-            , partTwo = \_ -> Nothing
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Seventeen"
-            , state = Pending
-            , partOne = \_ -> Nothing
-            , partTwo = \_ -> Nothing
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Eighteen"
-            , state = Pending
-            , partOne = \_ -> Nothing
-            , partTwo = \_ -> Nothing
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Nineteen"
-            , state = Pending
-            , partOne = \_ -> Nothing
-            , partTwo = \_ -> Nothing
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Twenty"
-            , state = Pending
-            , partOne = \_ -> Nothing
-            , partTwo = \_ -> Nothing
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Twenty-One"
-            , state = Pending
-            , partOne = \_ -> Nothing
-            , partTwo = \_ -> Nothing
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Twenty-Two"
-            , state = Pending
-            , partOne = \_ -> Nothing
-            , partTwo = \_ -> Nothing
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Twenty-Three"
-            , state = Pending
-            , partOne = \_ -> Nothing
-            , partTwo = \_ -> Nothing
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Twenty-Four"
-            , state = Pending
-            , partOne = \_ -> Nothing
-            , partTwo = \_ -> Nothing
-            , debugString = Nothing
-            }
-        , dayDiv
-            { name = "December Twenty-Five"
-            , state = Pending
-            , partOne = \_ -> Nothing
-            , partTwo = \_ -> Nothing
-            , debugString = Nothing
-            }
-        , div [ class "flex-spacer" ] []
-        ]
+        (model.dayConfiguration
+            |> List.map (\a -> dayDiv a)
+            |> prepend [ div [ class "flex-spacer" ] [] ]
+        )
+
+
+prepend : List a -> List a -> List a
+prepend a b =
+    List.append b a
+
+
+
+-- UPDATE
+
+
+update : Msg -> Model -> Model
+update _ model =
+    model
 
 
 dayDiv : Day -> Html msg
 dayDiv day =
     div
-        (if day.state == Pending then
-            [ class "day-wrapper", class "pending" ]
+        (case ( day.partOne, day.partTwo ) of
+            ( Pending _, Pending _ ) ->
+                [ class "day-wrapper", class "pending" ]
 
-         else if day.debugString == Nothing then
-            [ class "day-wrapper" ]
+            ( Solved _, Solved _ ) ->
+                [ class "day-wrapper", class "solved" ]
 
-         else
-            [ class "day-wrapper", class "debug" ]
+            ( _, _ ) ->
+                [ class "day-wrapper", class "solving" ]
         )
         [ div
             [ class "heading-wrapper" ]
             [ h2 [] [ text day.name ] ]
-        , partField "Part One: " (day.partOne ())
-        , partField "Part Two: " (day.partTwo ())
-        , textarea [ class "hidden-debug", attribute "readonly" "" ] [ text (Maybe.withDefault "" day.debugString) ]
+        , partField "Part One: " day.partOne
+        , partField "Part Two: " day.partTwo
+        , textarea [ class "hidden-debug", attribute "readonly" "" ] [ text (Maybe.withDefault "test test test" day.debugString) ]
         ]
 
 
-partField : String -> Maybe String -> Html msg
-partField labelString partString =
+partField : String -> SolutionStatus -> Html msg
+partField labelString solution =
     p
-        (if Nothing == partString then
-            [ class "param", class "failed" ]
-
-         else
-            [ class "param" ]
+        ([ class "param" ]
+            |> List.append (solutionAttributes solution)
         )
         [ span [ class "param-name" ] [ text labelString ]
-        , span [ class "param-value" ] [ text (Maybe.withDefault "error" partString) ]
+        , span [ class "param-value" ] [ text (solutionText solution) ]
         ]
+
+
+solutionText : SolutionStatus -> String
+solutionText solution =
+    case solution of
+        Pending _ ->
+            "Pending"
+
+        Solving _ ->
+            "Solving"
+
+        Solved value ->
+            Maybe.withDefault "Nothing" value
+
+
+solutionAttributes : SolutionStatus -> List (Html.Attribute msg)
+solutionAttributes solution =
+    case solution of
+        Solved value ->
+            if Nothing == value then
+                [ class "failed" ]
+
+            else
+                [ class "solved" ]
+
+        Pending _ ->
+            [ class "pending" ]
+
+        Solving _ ->
+            [ class "solving" ]
