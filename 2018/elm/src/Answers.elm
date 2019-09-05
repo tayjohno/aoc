@@ -11,6 +11,22 @@ import Day06
 import Day07
 import Day08
 import Day09
+import Day10
+import Day11
+import Day12
+import Day13
+import Day14
+import Day15
+import Day16
+import Day17
+import Day18
+import Day19
+import Day20
+import Day21
+import Day22
+import Day23
+import Day24
+import Day25
 import Html exposing (Html, button, div, h2, p, span, text, textarea)
 import Html.Attributes exposing (attribute, class, style)
 import Html.Events exposing (onClick)
@@ -91,23 +107,23 @@ initialConfiguration =
     , newDay "December Six" Day06.partOne Day06.partTwo
     , newDay "December Seven" Day07.partOne Day07.partTwo
     , newDay "December Eight" Day08.partOne Day08.partTwo
-    , newDay "December Nine" notImplemented notImplemented
-    , newDay "December Ten" notImplemented notImplemented
-    , newDay "December Eleven" notImplemented notImplemented
-    , newDay "December Twelve" notImplemented notImplemented
-    , newDay "December Thirteen" notImplemented notImplemented
-    , newDay "December Fourteen" notImplemented notImplemented
-    , newDay "December Fifteen" notImplemented notImplemented
-    , newDay "December Sixteen" notImplemented notImplemented
-    , newDay "December Seventeen" notImplemented notImplemented
-    , newDay "December Eighteen" notImplemented notImplemented
-    , newDay "December Nineteen" notImplemented notImplemented
-    , newDay "December Twenty" notImplemented notImplemented
-    , newDay "December Twenty-One" notImplemented notImplemented
-    , newDay "December Twenty-Two" notImplemented notImplemented
-    , newDay "December Twenty-Three" notImplemented notImplemented
-    , newDay "December Twenty-Four" notImplemented notImplemented
-    , newDay "December Twenty-Five" notImplemented notImplemented
+    , newDay "December Nine" Day09.partOne Day09.partTwo
+    , newDay "December Ten" Day10.partOne Day10.partTwo
+    , newDay "December Eleven" Day11.partOne Day11.partTwo
+    , newDay "December Twelve" Day12.partOne Day12.partTwo
+    , newDay "December Thirteen" Day13.partOne Day13.partTwo
+    , newDay "December Fourteen" Day14.partOne Day14.partTwo
+    , newDay "December Fifteen" Day15.partOne Day15.partTwo
+    , newDay "December Sixteen" Day16.partOne Day16.partTwo
+    , newDay "December Seventeen" Day17.partOne Day17.partTwo
+    , newDay "December Eighteen" Day18.partOne Day18.partTwo
+    , newDay "December Nineteen" Day19.partOne Day19.partTwo
+    , newDay "December Twenty" Day20.partOne Day20.partTwo
+    , newDay "December Twenty-One" Day21.partOne Day21.partTwo
+    , newDay "December Twenty-Two" Day22.partOne Day22.partTwo
+    , newDay "December Twenty-Three" Day23.partOne Day23.partTwo
+    , newDay "December Twenty-Four" Day24.partOne Day24.partTwo
+    , newDay "December Twenty-Five" Day25.partOne Day25.partTwo
     ]
 
 
@@ -211,14 +227,14 @@ getNextDay days day =
 
 delayedStartPartOne : Day -> Cmd Msg
 delayedStartPartOne day =
-    Process.sleep 200
+    Process.sleep 100
         |> Task.andThen (\_ -> Task.succeed (Updated { day | partOne = solve day.partOne }))
         |> Task.perform identity
 
 
 delayedStartPartTwo : Day -> Cmd Msg
 delayedStartPartTwo day =
-    Process.sleep 200
+    Process.sleep 100
         |> Task.andThen (\_ -> Task.succeed (Updated { day | partTwo = solve day.partTwo }))
         |> Task.perform identity
 

@@ -1,4 +1,4 @@
-module Day14 exposing (input)
+module Day14 exposing (partOne, partTwo)
 
 import Array exposing (Array)
 
@@ -7,11 +7,15 @@ input =
     633601
 
 
-partOne : Array (Maybe Int)
-partOne =
-    Array.initialize input (always Nothing)
+
+-- Array.initialize input(always Nothing)
+
+
+partOne : () -> Maybe String
+partOne _ =
+    Nothing
 
 
 partTwo : () -> Maybe String
-partTwo =
+partTwo _ =
     Nothing

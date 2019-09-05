@@ -9,20 +9,18 @@ input =
 
 
 partOne : () -> Maybe String
-partOne =
-    \_ ->
-        let
-            matrix =
-                mapCoordinates (calculateScore input) empty
-        in
-        partOneHelper ( 0, 0 ) matrix Nothing
-            |> Maybe.andThen (toString >> Just)
+partOne _ =
+    let
+        matrix =
+            mapCoordinates (calculateScore input) empty
+    in
+    partOneHelper ( 0, 0 ) matrix Nothing
+        |> Maybe.andThen (toString >> Just)
 
 
 partTwo : () -> Maybe String
-partTwo =
-    \_ ->
-        Nothing
+partTwo _ =
+    Nothing
 
 
 toString : Coordinate -> String

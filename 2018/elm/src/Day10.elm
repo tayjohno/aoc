@@ -21,12 +21,12 @@ partOneManual =
 
 
 partOne : () -> Maybe String
-partOne =
+partOne _ =
     Just "AHFGRKEE"
 
 
 partTwo : () -> Maybe String
-partTwo =
+partTwo _ =
     Nothing
 
 
