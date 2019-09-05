@@ -28,6 +28,10 @@
       width: 100%;
     }
 
+    .day-wrapper.pending {
+      filter: opacity(0.5);
+    }
+
     .flex-spacer {
       flex-grow: 999;
       width: 200px;
@@ -63,10 +67,10 @@
     }
 
     .param.solving {
-      animation: blinkingText 1s infinite;
+      -webkit-animation: blinkingText 1s infinite;
     }
 
-    @keyframes blinkingText{
+    @-webkit-keyframes blinkingText{
     	0%{ color: lightgray; }
     	50%{ color: green; }
     	100%{ color: lightgray; }
@@ -90,7 +94,7 @@
     }
 
     .param-value {
-      font-family: courier;
+      font-family: courier, monospace;
       border: 1px solid #bbbbbb;
       padding: 3px 6px 1px;
       background-color: #ffffff;
@@ -102,7 +106,7 @@
       display: none;
       resize: none;
       height: 200px;
-      font-family: courier;
+      font-family: courier, monospace;
       overflow: auto;
       white-space: pre;
     }
