@@ -1,4 +1,8 @@
-module Day12 exposing (partOne, partTwo)
+module Day12 exposing (..)
+
+import Day12.Input exposing (Neighbors, Planter(..), Row, Rule, input, printPlanter, printRow, printRule, ruleSet)
+
+
 
 {--Day 12: Subterranean Sustainability ---
 
@@ -6,7 +10,7 @@ The year 518 is significantly more underground than your history books implied. 
 you've arrived in a vast cavern network under the North Pole.
 
 After exploring a little, you discover a long tunnel that contains a row of small pots as far as you
-can see to your left and right. A few of them contain plants - someone is trying to grow things in
+can see to your left and right. A few of them contain plantes - someone is trying to grow things in
 these geothermally-heated caves.
 
 The pots are numbered, with 0 in front of you. To the left, the pots are numbered -1, -2, -3, and so
@@ -55,7 +59,8 @@ initial state: #..#.#..##......###...###
   ###.# => #
   ####. => #
 
-For brevity, in this example, only the combinations which do produce a plant are listed. (Your input includes all possible combinations.) Then, the next 20 generations will look like this:
+For brevity, in this example, only the combinations which do produce a plant are listed. (Your input
+includes all possible combinations.) Then, the next 20 generations will look like this:
 
                    1         2         3
          0         0         0         0
@@ -97,80 +102,146 @@ After 20 generations, what is the sum of the numbers of all pots which contain a
 -}
 
 
-type alias Rule =
-    { criteria : Criteria
-    , output : Bool
-    }
-
-
-type alias Criteria =
-    { ll : Bool
-    , l : Bool
-    , c : Bool
-    , r : Bool
-    , rr : Bool
-    }
-
-
-rawInput : String
-rawInput =
-    "#...#..##.......####.#..###..#.##..########.#.#...#.#...###.#..###.###.#.#..#...#.#..##..#######.##"
-
-
-input : List Char
-input =
-    rawInput
-        |> String.toList
-
-
-rawConfig : String
-rawConfig =
-    """
-#..#. => #
-#.#.. => #
-###.. => #
-##..# => .
-.#.## => #
-..... => .
-...#. => #
-##.#. => #
-#.#.# => .
-###.# => #
-....# => .
-####. => #
-.##.. => #
-#.##. => #
-#..## => #
-##... => #
-#...# => .
-##.## => #
-.#... => .
-.#..# => #
-..#.# => #
-##### => .
-.#### => #
-..#.. => #
-#.### => .
-..##. => .
-.##.# => #
-.#.#. => .
-..### => .
-.###. => .
-...## => .
-#.... => .
-    """
-
-
-config : List Rule
-config =
-    []
-
-
 partOne : () -> Maybe String
 partOne _ =
-    Nothing
+    input
+        |> helper 20
+        |> String.fromInt
+        |> Just
 
 
 partTwo : () -> Maybe String
 partTwo _ =
-    Nothing
+    input
+        |> helper 50000000000
+        |> String.fromInt
+        |> Just
+
+
+performGeneration : List Rule -> Row -> Row
+performGeneration rules row =
+    -- let
+    --     _ =
+    --         row.planters |> printRow |> Debug.log (String.fromInt row.index)
+    -- in
+    { index = row.index - 1
+    , planters =
+        generationHelper rules
+            (List.append row.planters [ NoPlant, NoPlant, NoPlant ] |> List.append [ NoPlant, NoPlant, NoPlant ])
+    }
+        |> compact
+
+
+generationHelper : List Rule -> List Planter -> List Planter
+generationHelper ruleList planterList =
+    case ( nextNeighbors planterList, planterList ) of
+        ( Result.Ok neighbors, a :: tail ) ->
+            lookupRule ruleList neighbors :: generationHelper ruleList tail
+
+        ( Result.Ok neighbors, [] ) ->
+            lookupRule ruleList neighbors :: planterList
+
+        ( Result.Err _, tail ) ->
+            []
+
+
+nextNeighbors : List Planter -> Result String Neighbors
+nextNeighbors planterList =
+    case planterList of
+        a :: b :: c :: d :: e :: rest ->
+            Result.Ok { ll = a, l = b, c = c, r = d, rr = e }
+
+        _ ->
+            Result.Err "No Neighbors Left"
+
+
+compact : Row -> Row
+compact row =
+    case row.planters of
+        NoPlant :: tail ->
+            compact { index = row.index + 1, planters = tail }
+
+        _ ->
+            { row | planters = List.reverse (removeLeading NoPlant (List.reverse row.planters)) }
+
+
+removeLeading : a -> List a -> List a
+removeLeading a aList =
+    case aList of
+        [] ->
+            []
+
+        head :: tail ->
+            if head == a then
+                removeLeading a tail
+
+            else
+                aList
+
+
+lookupRule : List Rule -> Neighbors -> Planter
+lookupRule rules neighbors =
+    case rules of
+        [] ->
+            NoPlant
+
+        head :: tail ->
+            if head.neighbors == neighbors then
+                head.output
+
+            else
+                lookupRule tail neighbors
+
+
+sum : Row -> Int
+sum row =
+    case row.planters of
+        [] ->
+            0
+
+        NoPlant :: tail ->
+            sum { index = row.index + 1, planters = tail }
+
+        Plant :: tail ->
+            row.index + sum { index = row.index + 1, planters = tail }
+
+
+helper : Int -> Row -> Int
+helper iterations row =
+    if iterations == 0 then
+        sum row
+
+    else
+        let
+            nextRow =
+                performGeneration ruleSet row
+        in
+        case loopDistance row nextRow of
+            Nothing ->
+                helper (iterations - 1) nextRow
+
+            Just i ->
+                sum row + iterations * plantCount row
+
+
+plantCount : Row -> Int
+plantCount row =
+    row.planters
+        |> List.foldl
+            (\a ->
+                if a == Plant then
+                    (+) 1
+
+                else
+                    identity
+            )
+            0
+
+
+loopDistance : Row -> Row -> Maybe Int
+loopDistance row1 row2 =
+    if row1.planters == row2.planters then
+        Just (row2.index - row1.index)
+
+    else
+        Nothing
