@@ -6,7 +6,7 @@ import Parser exposing (..)
 
 type alias Map =
     { tiles : Matrix Tile
-    , carts : List ( Int, Int )
+    , carts : List Cart
     }
 
 
@@ -88,26 +88,21 @@ prettyPrintMapList list =
         |> always Nothing
 
 
-tileParser : Parser (List Tile)
+tileParser : Parser ( List Tile, List Cart )
 tileParser =
     oneOf
-        [ succeed [ LeftToRight, BottomToLeft ] |. token "-╲"
-        , succeed [ LeftToRight, TopToLeft ] |. token "-/"
-        , succeed [ Empty ] |. token " "
-        , succeed [ LeftToRight ] |. leftToRightToken
-        , succeed [ TopToBottom ] |. topToBottomToken
-        , succeed [ BottomToRight ] |. token "/"
-        , succeed [ TopToRight ] |. token "╲"
-        , succeed [ Intersection ] |. token "+"
-        ]
-
-
-leftToRightToken : Parser ()
-leftToRightToken =
-    oneOf
-        [ token "-"
-        , token ">"
-        , token "<"
+        [ succeed ( [ LeftToRight, BottomToLeft ], [] ) |. token "-╲"
+        , succeed ( [ LeftToRight, TopToLeft ], [] ) |. token "-/"
+        , succeed ( [ Empty ], [] ) |. token " "
+        , succeed ( [ LeftToRight ], [] ) |. token "-"
+        , succeed ( [ LeftToRight ], [ { coordinate = ( 0, 0 ), heading = West } ] ) |. token "<"
+        , succeed ( [ LeftToRight ], [ { coordinate = ( 0, 0 ), heading = East } ] ) |. token ">"
+        , succeed ( [ TopToBottom ], [] ) |. token "|"
+        , succeed ( [ TopToBottom ], [ { coordinate = ( 0, 0 ), heading = North } ] ) |. token "^"
+        , succeed ( [ TopToBottom ], [ { coordinate = ( 0, 0 ), heading = South } ] ) |. token "v"
+        , succeed ( [ BottomToRight ], [] ) |. token "/"
+        , succeed ( [ TopToRight ], [] ) |. token "╲"
+        , succeed ( [ Intersection ], [] ) |. token "+"
         ]
 
 
@@ -148,47 +143,47 @@ tileToS tile =
             "+"
 
 
-mapParser : Parser (List (List Tile))
+mapParser : Parser ( List (List Tile), List Cart )
 mapParser =
     succeed identity
-        |= Parser.loop [] mapHelper
+        |= Parser.loop ( [], [] ) mapHelper
         |. end
 
 
-mapHelper : List (List Tile) -> Parser (Step (List (List Tile)) (List (List Tile)))
-mapHelper memo =
+mapHelper : ( List (List Tile), List Cart ) -> Parser (Step ( List (List Tile), List Cart ) ( List (List Tile), List Cart ))
+mapHelper ( mapMemo, cartMemo ) =
     let
         _ =
-            Debug.log "memo" memo
+            Debug.log "memo" mapMemo
     in
     oneOf
         [ succeed ()
             |. end
-            |> map (\_ -> Done (List.reverse memo))
-        , succeed (\newVal -> Loop (newVal :: memo))
+            |> map (\_ -> Done ( List.reverse mapMemo, cartMemo ))
+        , succeed (\( newTiles, newCarts ) -> Loop ( newTiles :: mapMemo, List.append newCarts cartMemo ))
             |= rowParser
         , succeed ()
-            |> map (\_ -> Done (List.reverse memo))
+            |> map (\_ -> Done ( List.reverse mapMemo, cartMemo ))
         ]
 
 
-rowParser : Parser (List Tile)
+rowParser : Parser ( List Tile, List Cart )
 rowParser =
     succeed identity
-        |= Parser.loop [] rowHelper
+        |= Parser.loop ( [], [] ) rowHelper
         |. oneOf
             [ succeed () |. token "\n"
             , succeed ()
             ]
 
 
-rowHelper : List Tile -> Parser (Step (List Tile) (List Tile))
-rowHelper memo =
+rowHelper : ( List Tile, List Cart ) -> Parser (Step ( List Tile, List Cart ) ( List Tile, List Cart ))
+rowHelper ( rowMemo, cartMemo ) =
     oneOf
-        [ succeed (\newVals -> Loop (List.append memo newVals))
+        [ succeed (\( r, c ) -> Loop ( List.append rowMemo r, List.append cartMemo c ))
             |= tileParser
         , succeed ()
-            |> map (\_ -> Done memo)
+            |> map (\_ -> Done ( rowMemo, cartMemo ))
         ]
 
 
@@ -202,8 +197,8 @@ input =
         Result.Err _ ->
             Debug.todo "Couldn't parse a map"
 
-        Result.Ok rows ->
-            { carts = [], tiles = Matrix.fromRows rows Empty }
+        Result.Ok ( rows, carts ) ->
+            { carts = carts, tiles = Matrix.fromRows rows Empty }
 
 
 
