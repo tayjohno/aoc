@@ -1,4 +1,4 @@
-module Matrix exposing (Coordinate, Matrix, Size, allCoordinates, allCoordinatesHelper, empty, get, prettyPrint, set, toRows, toString, transformElement)
+module Matrix exposing (Coordinate, Matrix, Size, allCoordinates, allCoordinatesHelper, empty, fromRows, get, prettyPrint, set, toRows, toString, transformElement)
 
 import Array exposing (Array)
 
@@ -82,6 +82,29 @@ toRows matrix =
                 { data = Array.fromList (List.drop width (Array.toList matrix.data))
                 , size = ( width, height - 1 )
                 }
+
+
+fromRows : List (List a) -> a -> Matrix a
+fromRows rows default =
+    let
+        size =
+            ( rows |> List.map List.length |> List.maximum |> Maybe.withDefault 0
+            , rows |> List.length
+            )
+
+        data =
+            Array.fromList
+                ((rows
+                    |> List.map
+                        (\row -> List.append row (List.repeat (Tuple.first size - List.length row) default))
+                 )
+                    |> Debug.log "rows"
+                    |> List.concat
+                )
+    in
+    { data = data
+    , size = size
+    }
 
 
 allCoordinates : Matrix a -> List Coordinate
