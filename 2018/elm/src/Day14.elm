@@ -75,6 +75,13 @@ Your puzzle input is 633601.
 --}
 
 
+type alias State =
+    { scores : String
+    , elfA : Int
+    , elfB : Int
+    }
+
+
 input : Int
 input =
     633601
@@ -84,9 +91,86 @@ input =
 -}
 partOne : () -> Maybe String
 partOne _ =
-    Nothing
+    { scores = "37", elfA = 0, elfB = 1 }
+        |> simulateOne input
+        |> Just
 
 
 partTwo : () -> Maybe String
 partTwo _ =
-    Nothing
+    { scores = "37", elfA = 0, elfB = 1 }
+        |> simulateTwo input
+        |> String.fromInt
+        |> Just
+
+
+simulateOne : Int -> State -> String
+simulateOne int state =
+    if String.length state.scores >= (int + 10) then
+        String.slice int (int + 10) state.scores
+
+    else
+        simulateOne int (tick state)
+
+
+simulateTwo : Int -> State -> Int
+simulateTwo int state =
+    let
+        finalScoresA =
+            state.scores |> String.right 6 |> String.toInt |> Maybe.withDefault -1
+
+        finalScoresB =
+            state.scores |> String.right 7 |> String.left 6 |> String.toInt |> Maybe.withDefault -1
+    in
+    if finalScoresA == int then
+        String.length state.scores - 6
+
+    else if finalScoresB == int then
+        String.length state.scores - 7
+
+    else
+        simulateTwo int (tick state)
+
+
+tick : State -> State
+tick state =
+    let
+        _ =
+            if String.length state.scores |> remainderBy 1000 |> (==) 0 then
+                Debug.log "length" (String.length state.scores)
+
+            else
+                0
+
+        aScore =
+            state.scores
+                |> String.slice state.elfA (state.elfA + 1)
+                |> String.toInt
+                |> assert
+
+        bScore =
+            state.scores
+                |> String.slice state.elfB (state.elfB + 1)
+                |> String.toInt
+                |> assert
+
+        newScores =
+            aScore
+                + bScore
+                |> String.fromInt
+                |> String.append state.scores
+    in
+    { scores = newScores
+    , elfA = remainderBy (String.length newScores) (state.elfA + aScore + 1)
+    , elfB = remainderBy (String.length newScores) (state.elfB + bScore + 1)
+    }
+
+
+assert : Maybe a -> a
+assert aMaybe =
+    case aMaybe of
+        Just a ->
+            a
+
+        Nothing ->
+            Debug.todo "oops!"
