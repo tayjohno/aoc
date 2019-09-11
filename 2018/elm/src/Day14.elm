@@ -96,10 +96,19 @@ partOne _ =
         |> Just
 
 
-partTwo : () -> Maybe String
-partTwo _ =
+partTwo : Maybe Int -> Maybe String
+partTwo maybeInt =
+    let
+        problemInput =
+            case maybeInt of
+                Just i ->
+                    i
+
+                Nothing ->
+                    input
+    in
     { scores = "37", elfA = 0, elfB = 1 }
-        |> simulateTwo input
+        |> simulateTwo problemInput
         |> String.fromInt
         |> Just
 
@@ -115,21 +124,27 @@ simulateOne int state =
 
 simulateTwo : Int -> State -> Int
 simulateTwo int state =
-    let
-        finalScoresA =
-            state.scores |> String.right 6 |> String.toInt |> Maybe.withDefault -1
+    case String.indexes (String.fromInt int) (String.right 20000 state.scores) of
+        index :: _ ->
+            case String.indexes (String.fromInt int) state.scores of
+                i :: _ ->
+                    i
 
-        finalScoresB =
-            state.scores |> String.right 7 |> String.left 6 |> String.toInt |> Maybe.withDefault -1
-    in
-    if finalScoresA == int then
-        String.length state.scores - 6
+                _ ->
+                    Debug.todo "Should be impossible"
 
-    else if finalScoresB == int then
-        String.length state.scores - 7
+        _ ->
+            simulateTwo int (times 10000 tick state)
 
-    else
-        simulateTwo int (tick state)
+
+times : Int -> (a -> a) -> a -> a
+times int function a =
+    case int of
+        0 ->
+            a
+
+        _ ->
+            times (int - 1) function (function a)
 
 
 tick : State -> State
