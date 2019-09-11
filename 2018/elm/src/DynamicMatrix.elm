@@ -11,10 +11,8 @@ type alias Coordinate =
     { x : Int, y : Int }
 
 
-
--- Default "empty" starting point is an 4x4 matrix. This felt like a good size from a
-
-
+{-| Default "empty" starting point is an 4x4 matrix. This felt like a good size
+-}
 empty : a -> Matrix a
 empty defaultVal =
     { data = Array.fromList (List.repeat 16 defaultVal)

@@ -1,6 +1,6 @@
 module Day14 exposing (partOne, partTwo)
 
-import Array exposing (Array)
+import DynamicArray exposing (DynamicArray)
 
 
 
@@ -76,7 +76,7 @@ Your puzzle input is 633601.
 
 
 type alias State =
-    { scores : String
+    { scores : DynamicArray Int
     , elfA : Int
     , elfB : Int
     }
@@ -91,32 +91,25 @@ input =
 -}
 partOne : () -> Maybe String
 partOne _ =
-    { scores = "37", elfA = 0, elfB = 1 }
+    { scores = DynamicArray.new 0 [ 3, 7 ], elfA = 0, elfB = 1 }
         |> simulateOne input
         |> Just
 
 
 partTwo : Maybe Int -> Maybe String
-partTwo maybeInt =
-    let
-        problemInput =
-            case maybeInt of
-                Just i ->
-                    i
-
-                Nothing ->
-                    input
-    in
-    { scores = "37", elfA = 0, elfB = 1 }
-        |> simulateTwo problemInput
+partTwo () =
+    { scores = DynamicArray.new 0 [ 3, 7 ], elfA = 0, elfB = 1 }
+        |> simulateTwo input
         |> String.fromInt
         |> Just
 
 
 simulateOne : Int -> State -> String
 simulateOne int state =
-    if String.length state.scores >= (int + 10) then
-        String.slice int (int + 10) state.scores
+    if DynamicArray.length state.scores >= (int + 10) then
+        DynamicArray.slice int (int + 10) state.scores
+            |> List.map String.fromInt
+            |> String.join ""
 
     else
         simulateOne int (tick state)
@@ -124,17 +117,18 @@ simulateOne int state =
 
 simulateTwo : Int -> State -> Int
 simulateTwo int state =
-    case String.indexes (String.fromInt int) (String.right 20000 state.scores) of
+    let
+        nextSlice =
+            DynamicArray.right 5000 state.scores
+                |> List.map String.fromInt
+                |> String.join ""
+    in
+    case String.indexes (String.fromInt int) nextSlice of
         index :: _ ->
-            case String.indexes (String.fromInt int) state.scores of
-                i :: _ ->
-                    i
-
-                _ ->
-                    Debug.todo "Should be impossible"
+            index + (DynamicArray.length state.scores - 5000 |> max 0)
 
         _ ->
-            simulateTwo int (times 10000 tick state)
+            simulateTwo int (times 2500 tick state)
 
 
 times : Int -> (a -> a) -> a -> a
@@ -150,34 +144,27 @@ times int function a =
 tick : State -> State
 tick state =
     let
-        _ =
-            if String.length state.scores |> remainderBy 1000 |> (==) 0 then
-                Debug.log "length" (String.length state.scores)
-
-            else
-                0
-
         aScore =
             state.scores
-                |> String.slice state.elfA (state.elfA + 1)
-                |> String.toInt
+                |> DynamicArray.get state.elfA
                 |> assert
 
         bScore =
             state.scores
-                |> String.slice state.elfB (state.elfB + 1)
-                |> String.toInt
+                |> DynamicArray.get state.elfB
                 |> assert
 
         newScores =
             aScore
                 + bScore
                 |> String.fromInt
-                |> String.append state.scores
+                |> String.split ""
+                |> List.map (String.toInt >> Maybe.withDefault 0)
+                |> (\scores -> DynamicArray.insertEach scores state.scores)
     in
     { scores = newScores
-    , elfA = remainderBy (String.length newScores) (state.elfA + aScore + 1)
-    , elfB = remainderBy (String.length newScores) (state.elfB + bScore + 1)
+    , elfA = remainderBy (DynamicArray.length newScores) (state.elfA + aScore + 1)
+    , elfB = remainderBy (DynamicArray.length newScores) (state.elfB + bScore + 1)
     }
 
 
