@@ -96,8 +96,8 @@ partOne _ =
         |> Just
 
 
-partTwo : Maybe Int -> Maybe String
-partTwo () =
+partTwo : () -> Maybe String
+partTwo _ =
     { scores = DynamicArray.new 0 [ 3, 7 ], elfA = 0, elfB = 1 }
         |> simulateTwo input
         |> String.fromInt
