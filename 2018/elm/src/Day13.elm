@@ -1,6 +1,7 @@
 module Day13 exposing (partOne, partTwo)
 
-import Day13.Input exposing (input)
+import Day13.Input exposing (Cart, Heading(..), Map, Tile(..), TurnDirection(..), input)
+import Matrix
 
 
 
@@ -63,7 +64,7 @@ For example, suppose there are two carts on a straight track:
 
 First, the top cart moves. It is facing down (v), so it moves down one square. Second, the bottom
 cart moves. It is facing up (^), so it moves up one square. Because all carts have moved, the first
-tick ends. Then, the process repeats, starting with the first cart. The first cart moves down, then
+tickOne ends. Then, the process repeats, starting with the first cart. The first cart moves down, then
 the second cart moves up - right into the first cart, colliding with it! (The location of the crash
 is marked with an X.) This ends the second and last tick.
 
@@ -194,9 +195,267 @@ In this example, the location of the first crash is 7,3.
 
 partOne : () -> Maybe String
 partOne _ =
-    Nothing
+    input
+        |> simulateCrash
+        |> coordinateToString
+        |> Just
 
 
 partTwo : () -> Maybe String
 partTwo _ =
-    Nothing
+    input
+        |> simulateAllCrashes
+        |> coordinateToString
+        |> Just
+
+
+coordinateToString : Matrix.Coordinate -> String
+coordinateToString ( x, y ) =
+    String.fromInt x
+        ++ ","
+        ++ String.fromInt y
+
+
+simulateCrash : Map -> Matrix.Coordinate
+simulateCrash map =
+    case tickOne map of
+        Safe carts ->
+            simulateCrash { map | carts = carts }
+
+        Crash location ->
+            location
+
+
+simulateAllCrashes : Map -> Matrix.Coordinate
+simulateAllCrashes map =
+    case tickTwo map of
+        One cart ->
+            cart.coordinate
+
+        Many carts ->
+            simulateAllCrashes { map | carts = carts }
+
+
+type TickResult a
+    = Safe a
+    | Crash Matrix.Coordinate
+
+
+type CrashesResult
+    = Many (List Cart)
+    | One Cart
+
+
+tickOne : Map -> TickResult (List Cart)
+tickOne map =
+    map.carts
+        |> sortCarts
+        |> tickOneHelper map []
+
+
+{-| maps a list of individual tickOne results into a list tickOne result -
+-}
+tickOneHelper : Map -> List Cart -> List Cart -> TickResult (List Cart)
+tickOneHelper map checked toCheck =
+    case toCheck of
+        [] ->
+            Safe checked
+
+        cart :: tail ->
+            case tickCart map (List.append checked tail) cart of
+                Safe tickedCart ->
+                    tickOneHelper map (tickedCart :: checked) tail
+
+                Crash location ->
+                    Crash location
+
+
+tickTwo : Map -> CrashesResult
+tickTwo map =
+    map.carts
+        |> sortCarts
+        |> tickTwoHelper map []
+
+
+{-| maps a list of individual tickOne results into a list tickOne result -
+-}
+tickTwoHelper : Map -> List Cart -> List Cart -> CrashesResult
+tickTwoHelper map checked toCheck =
+    case toCheck of
+        [] ->
+            case checked of
+                cart :: [] ->
+                    One cart
+
+                _ ->
+                    Many checked
+
+        cart :: tail ->
+            case tickCart map (List.append checked tail) cart of
+                Safe tickedCart ->
+                    tickTwoHelper map (tickedCart :: checked) tail
+
+                Crash location ->
+                    tickTwoHelper map (removeCrash location checked) (removeCrash location tail)
+
+
+removeCrash : Matrix.Coordinate -> List Cart -> List Cart
+removeCrash coordinate =
+    List.filter (.coordinate >> (/=) coordinate)
+
+
+{-| tickCart moves a single cart one tickOne forwards.
+
+This will do the following:
+
+  - Move the cart in the current direction.
+  - Determine a new direction (if required).
+  - Detect collisions
+
+-}
+tickCart : Map -> List Cart -> Cart -> TickResult Cart
+tickCart map listCart cart =
+    cart
+        |> moveCart
+        |> turnCart map
+        |> detectCrash listCart
+
+
+moveCart : Cart -> Cart
+moveCart cart =
+    { cart
+        | coordinate =
+            case cart.heading of
+                North ->
+                    ( Tuple.first cart.coordinate
+                    , Tuple.second cart.coordinate - 1
+                    )
+
+                South ->
+                    ( Tuple.first cart.coordinate
+                    , Tuple.second cart.coordinate + 1
+                    )
+
+                East ->
+                    ( Tuple.first cart.coordinate + 1
+                    , Tuple.second cart.coordinate
+                    )
+
+                West ->
+                    ( Tuple.first cart.coordinate - 1
+                    , Tuple.second cart.coordinate
+                    )
+    }
+
+
+turnCart : Map -> Cart -> Cart
+turnCart map cart =
+    let
+        tile =
+            Matrix.get cart.coordinate map.tiles |> Maybe.withDefault Empty
+    in
+    if tile == Intersection then
+        handleIntersection cart
+
+    else if tile |> isCorner then
+        handleCorner tile cart
+
+    else
+        cart
+
+
+isCorner : Tile -> Bool
+isCorner tile =
+    [ BottomToLeft, TopToLeft, BottomToRight, TopToRight ]
+        |> List.any ((==) tile)
+
+
+handleCorner : Tile -> Cart -> Cart
+handleCorner tile cart =
+    case ( tile, cart.heading ) of
+        ( BottomToLeft, East ) ->
+            { cart | heading = South }
+
+        ( BottomToLeft, North ) ->
+            { cart | heading = West }
+
+        ( TopToLeft, East ) ->
+            { cart | heading = North }
+
+        ( TopToLeft, South ) ->
+            { cart | heading = West }
+
+        ( BottomToRight, West ) ->
+            { cart | heading = South }
+
+        ( BottomToRight, North ) ->
+            { cart | heading = East }
+
+        ( TopToRight, West ) ->
+            { cart | heading = North }
+
+        ( TopToRight, South ) ->
+            { cart | heading = East }
+
+        _ ->
+            Debug.todo "Bad Corner!"
+
+
+handleIntersection : Cart -> Cart
+handleIntersection cart =
+    case ( cart.heading, cart.nextTurn ) of
+        ( North, Left ) ->
+            { cart | heading = West, nextTurn = Straight }
+
+        ( South, Left ) ->
+            { cart | heading = East, nextTurn = Straight }
+
+        ( East, Left ) ->
+            { cart | heading = North, nextTurn = Straight }
+
+        ( West, Left ) ->
+            { cart | heading = South, nextTurn = Straight }
+
+        ( North, Straight ) ->
+            { cart | heading = North, nextTurn = Right }
+
+        ( South, Straight ) ->
+            { cart | heading = South, nextTurn = Right }
+
+        ( East, Straight ) ->
+            { cart | heading = East, nextTurn = Right }
+
+        ( West, Straight ) ->
+            { cart | heading = West, nextTurn = Right }
+
+        ( North, Right ) ->
+            { cart | heading = East, nextTurn = Left }
+
+        ( South, Right ) ->
+            { cart | heading = West, nextTurn = Left }
+
+        ( East, Right ) ->
+            { cart | heading = South, nextTurn = Left }
+
+        ( West, Right ) ->
+            { cart | heading = North, nextTurn = Left }
+
+
+detectCrash : List Cart -> Cart -> TickResult Cart
+detectCrash listCart cart =
+    case listCart of
+        [] ->
+            Safe cart
+
+        possibleCollision :: remainingCarts ->
+            if possibleCollision.coordinate == cart.coordinate then
+                Crash cart.coordinate
+
+            else
+                detectCrash remainingCarts cart
+
+
+sortCarts : List Cart -> List Cart
+sortCarts cartList =
+    cartList
+        |> List.sortBy .coordinate

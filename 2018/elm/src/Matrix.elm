@@ -98,7 +98,6 @@ fromRows rows default =
                     |> List.map
                         (\row -> List.append row (List.repeat (Tuple.first size - List.length row) default))
                  )
-                    |> Debug.log "rows"
                     |> List.concat
                 )
     in

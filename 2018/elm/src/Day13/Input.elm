@@ -24,6 +24,7 @@ type Tile
 type alias Cart =
     { coordinate : Matrix.Coordinate
     , heading : Heading
+    , nextTurn : TurnDirection
     }
 
 
@@ -34,29 +35,10 @@ type Heading
     | West
 
 
-rawInput : String
-rawInput =
-    """/->-╲
-|   |  /----╲
-| /-+--+-╲  |
-| | |  | v  |
-╲-+-/  ╲-+--/
-  ╲------/"""
-
-
-
--- input : Map
--- input =
---   let
---     rows =
---       rawInput. split
---   in
---     { tiles = Matrix.fromRows rows, carts = [] }
---
--- ( aListList |> List.map List.length |> List.maximum |> Maybe.withDefault 0
--- , aListList |> List.length
--- )
--- prettyPrintMap : String
+type TurnDirection
+    = Left
+    | Straight
+    | Right
 
 
 prettyPrintRawString : String -> Maybe a
@@ -92,18 +74,25 @@ tileParser : Parser ( List Tile, List Cart )
 tileParser =
     oneOf
         [ succeed ( [ LeftToRight, BottomToLeft ], [] ) |. token "-╲"
+        , succeed ( [ Intersection, BottomToLeft ], [] ) |. token "+╲"
         , succeed ( [ LeftToRight, TopToLeft ], [] ) |. token "-/"
+        , succeed ( [ Intersection, TopToLeft ], [] ) |. token "+/"
         , succeed ( [ Empty ], [] ) |. token " "
+        , succeed (\position -> ( [ LeftToRight ], [ { coordinate = toCoordinate position, heading = West, nextTurn = Left } ] )) |= getPosition |. token "<"
+        , succeed (\position -> ( [ LeftToRight ], [ { coordinate = toCoordinate position, heading = East, nextTurn = Left } ] )) |= getPosition |. token ">"
+        , succeed (\position -> ( [ TopToBottom ], [ { coordinate = toCoordinate position, heading = North, nextTurn = Left } ] )) |= getPosition |. token "^"
+        , succeed (\position -> ( [ TopToBottom ], [ { coordinate = toCoordinate position, heading = South, nextTurn = Left } ] )) |= getPosition |. token "v"
         , succeed ( [ LeftToRight ], [] ) |. token "-"
-        , succeed ( [ LeftToRight ], [ { coordinate = ( 0, 0 ), heading = West } ] ) |. token "<"
-        , succeed ( [ LeftToRight ], [ { coordinate = ( 0, 0 ), heading = East } ] ) |. token ">"
         , succeed ( [ TopToBottom ], [] ) |. token "|"
-        , succeed ( [ TopToBottom ], [ { coordinate = ( 0, 0 ), heading = North } ] ) |. token "^"
-        , succeed ( [ TopToBottom ], [ { coordinate = ( 0, 0 ), heading = South } ] ) |. token "v"
         , succeed ( [ BottomToRight ], [] ) |. token "/"
         , succeed ( [ TopToRight ], [] ) |. token "╲"
         , succeed ( [ Intersection ], [] ) |. token "+"
         ]
+
+
+toCoordinate : ( Int, Int ) -> Matrix.Coordinate
+toCoordinate ( row, col ) =
+    ( col - 1, row - 1 )
 
 
 topToBottomToken : Parser ()
@@ -152,10 +141,6 @@ mapParser =
 
 mapHelper : ( List (List Tile), List Cart ) -> Parser (Step ( List (List Tile), List Cart ) ( List (List Tile), List Cart ))
 mapHelper ( mapMemo, cartMemo ) =
-    let
-        _ =
-            Debug.log "memo" mapMemo
-    in
     oneOf
         [ succeed ()
             |. end
@@ -201,8 +186,17 @@ input =
             { carts = carts, tiles = Matrix.fromRows rows Empty }
 
 
-
-{--
+rawInput : String
+rawInput =
+    {--
+    """/->-╲
+|   |  /----╲
+| /-+--+-╲  |
+| | |  | v  |
+╲-+-/  ╲-+--/
+  ╲------/"""
+--}
+    -- {--
     """                /-->------------------------------╲  /-----------------------------------------------------------╲
                 |      /--------------------------+--+------------------------------------╲                      |                /------------------╲
                 |      |                          |  |      /-----------------------------+----------------------+----------╲     |                  |
