@@ -1,4 +1,4 @@
-module Matrix exposing (Coordinate, Matrix, Size, allCoordinates, allCoordinatesHelper, empty, fromRows, get, prettyPrint, set, toRows, toString, transformElement)
+module Matrix exposing (Coordinate, Matrix, Size, allCoordinates, allCoordinatesHelper, customPrint, empty, fromRows, get, locations, prettyPrint, set, toRows, toString, transformElement)
 
 import Array exposing (Array)
 
@@ -51,6 +51,31 @@ get ( x, y ) matrix =
 
     else
         Nothing
+
+
+{-| Return all the locations of a given item in the matrix
+-}
+locations : (a -> Bool) -> Matrix a -> List Coordinate
+locations aMatcher aMatrix =
+    aMatrix.data
+        |> Array.indexedMap
+            (\n a ->
+                if aMatcher a then
+                    Just (indexToCoordinate n aMatrix)
+
+                else
+                    Nothing
+            )
+        |> Array.foldl
+            (\maybeC acc ->
+                case maybeC of
+                    Nothing ->
+                        acc
+
+                    Just a ->
+                        a :: acc
+            )
+            []
 
 
 transformElement : Coordinate -> (a -> a) -> Matrix a -> Matrix a
@@ -144,27 +169,42 @@ isWithin ( width, height ) ( x, y ) =
     x >= 0 && y >= 0 && x < width && y < height
 
 
-prettyPrint : Matrix a -> Maybe a
+prettyPrint : Matrix a -> ()
 prettyPrint matrix =
-    if Array.length matrix.data == 0 then
-        Nothing
+    matrix
+        |> toRows
+        |> List.reverse
+        |> List.map (\a -> Debug.log "" a)
+        |> always ()
 
-    else
-        printLines 0 matrix
+
+customPrint : (a -> Char) -> Matrix a -> ()
+customPrint function matrix =
+    matrix
+        |> toRows
+        |> List.reverse
+        |> List.map (List.map function)
+        |> List.map String.fromList
+        |> List.map (Debug.log "")
+        |> always ()
 
 
-printLines : Int -> Matrix a -> Maybe a
-printLines index matrix =
+
+-- PRIVATE METHODS
+
+
+{-| Convert an array index to a coordinate.
+-}
+indexToCoordinate : Int -> Matrix a -> Coordinate
+indexToCoordinate int { size } =
     let
-        ( width, height ) =
-            matrix.size
+        ( width, _ ) =
+            size
 
-        nextRow =
-            Array.slice (index * width) ((index + 1) * width) matrix.data
-                |> Debug.log ""
+        x =
+            int // width
+
+        y =
+            remainderBy width int
     in
-    if height > index then
-        printLines (index + 1) matrix
-
-    else
-        Nothing
+    ( x, y )
