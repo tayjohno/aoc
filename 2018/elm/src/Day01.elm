@@ -1,20 +1,21 @@
 module Day01 exposing (partOne, partTwo)
 
+import Answer exposing (Answer(..))
 import Array exposing (Array)
 import Day01.Input exposing (input)
 import Set exposing (Set)
 
 
-partOne : () -> Maybe String
+partOne : () -> Answer String
 partOne =
     \_ ->
         input
             |> List.foldl (+) 0
             |> String.fromInt
-            |> Just
+            |> Solved
 
 
-partTwo : () -> Maybe String
+partTwo : () -> Answer String
 partTwo =
     \_ ->
         problemTwoStep 0
@@ -24,7 +25,7 @@ partTwo =
                 |> Array.fromList
             )
             |> String.fromInt
-            |> Just
+            |> Solved
 
 
 nextCycle : ( Int, Array a ) -> ( Maybe a, ( Int, Array a ) )

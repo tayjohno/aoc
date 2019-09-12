@@ -70,8 +70,12 @@
       color: #00800052;
     }
 
-    .param.solved {
+    .param.solved, .param.faked {
       color: green;
+    }
+
+    .param.faked::after {
+      content: ' *';
     }
 
     .param.failed {

@@ -26,6 +26,15 @@ new default aList =
     }
 
 
+
+-- newWithLength : Int -> a -> List a -> DynamicArray a
+-- newWithLength int default aList =
+--     { data = aList |> Array.repeat a
+--     , length = aList |> List.length
+--     , default = default
+--     }
+
+
 get : Int -> DynamicArray a -> Maybe a
 get int { data } =
     Array.get int data

@@ -1,5 +1,6 @@
 module Day13 exposing (partOne, partTwo)
 
+import Answer exposing (Answer(..))
 import Day13.Input exposing (Cart, Heading(..), Map, Tile(..), TurnDirection(..), input)
 import Matrix
 
@@ -193,20 +194,20 @@ In this example, the location of the first crash is 7,3.
 -}
 
 
-partOne : () -> Maybe String
+partOne : () -> Answer String
 partOne _ =
     input
         |> simulateCrash
         |> coordinateToString
-        |> Just
+        |> Solved
 
 
-partTwo : () -> Maybe String
+partTwo : () -> Answer String
 partTwo _ =
     input
         |> simulateAllCrashes
         |> coordinateToString
-        |> Just
+        |> Solved
 
 
 coordinateToString : Matrix.Coordinate -> String

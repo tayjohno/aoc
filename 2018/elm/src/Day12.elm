@@ -1,5 +1,6 @@
 module Day12 exposing (..)
 
+import Answer exposing (Answer(..))
 import Day12.Input exposing (Neighbors, Planter(..), Row, Rule, input, printPlanter, printRow, printRule, ruleSet)
 
 
@@ -102,20 +103,20 @@ After 20 generations, what is the sum of the numbers of all pots which contain a
 -}
 
 
-partOne : () -> Maybe String
+partOne : () -> Answer String
 partOne _ =
     input
         |> helper 20
         |> String.fromInt
-        |> Just
+        |> Solved
 
 
-partTwo : () -> Maybe String
+partTwo : () -> Answer String
 partTwo _ =
     input
         |> helper 50000000000
         |> String.fromInt
-        |> Just
+        |> Solved
 
 
 performGeneration : List Rule -> Row -> Row

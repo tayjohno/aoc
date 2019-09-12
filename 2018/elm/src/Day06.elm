@@ -1,5 +1,6 @@
 module Day06 exposing (partOne, partTwo)
 
+import Answer exposing (Answer(..))
 import Array exposing (Array)
 import Day06.Input exposing (input)
 import List.Unique
@@ -16,7 +17,7 @@ type alias Region =
     Int
 
 
-partOne : () -> Maybe String
+partOne : () -> Answer String
 partOne =
     \_ ->
         let
@@ -40,14 +41,14 @@ partOne =
                             tuple
                                 |> Tuple.second
                                 |> String.fromInt
-                                |> Just
+                                |> Solved
 
                         Nothing ->
-                            Nothing
+                            Unsolved
                )
 
 
-partTwo : () -> Maybe String
+partTwo : () -> Answer String
 partTwo =
     \_ ->
         let
@@ -62,7 +63,7 @@ partTwo =
             |> List.filter ((>) 10000)
             |> List.length
             |> String.fromInt
-            |> Just
+            |> Solved
 
 
 debug : Maybe String

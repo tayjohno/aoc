@@ -1,5 +1,9 @@
 module Day15 exposing (partOne, partTwo)
 
+import Answer exposing (Answer(..))
+
+
+
 {--- Day 15: Beverage Bandits ---
 
 Having perfected their hot chocolate, the Elves have a new problem: the Goblins that live in these
@@ -372,11 +376,11 @@ rawInput =
     """
 
 
-partOne : () -> Maybe String
+partOne : () -> Answer String
 partOne _ =
-    Nothing
+    Unsolved
 
 
-partTwo : () -> Maybe String
+partTwo : () -> Answer String
 partTwo _ =
-    Nothing
+    Unsolved

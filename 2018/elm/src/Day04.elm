@@ -1,5 +1,6 @@
 module Day04 exposing (partOne, partTwo)
 
+import Answer exposing (Answer(..))
 import Array exposing (Array)
 import Day04.Input exposing (Action(..), Date, Event, Guard, input)
 import Dict exposing (Dict)
@@ -19,7 +20,7 @@ type alias SleepLog =
     List SleepLogEntry
 
 
-partOne : () -> Maybe String
+partOne : () -> Answer String
 partOne =
     \_ ->
         let
@@ -32,10 +33,10 @@ partOne =
         guard
             * hour
             |> String.fromInt
-            |> Just
+            |> Solved
 
 
-partTwo : () -> Maybe String
+partTwo : () -> Answer String
 partTwo =
     \_ ->
         allGuards
@@ -45,7 +46,7 @@ partTwo =
             |> Maybe.withDefault ( 0, ( 0, 0 ) )
             |> (\( g, ( h, c ) ) -> g * h)
             |> String.fromInt
-            |> Just
+            |> Solved
 
 
 buildSleepLog : List Event -> SleepLog

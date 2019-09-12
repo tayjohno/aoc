@@ -1,10 +1,11 @@
 module Day02 exposing (partOne, partTwo)
 
+import Answer exposing (Answer(..))
 import Day02.Input exposing (input)
 import Dict exposing (Dict)
 
 
-partOne : () -> Maybe String
+partOne : () -> Answer String
 partOne =
     \_ ->
         let
@@ -21,14 +22,14 @@ partOne =
         in
         (twos * threes)
             |> String.fromInt
-            |> Just
+            |> Solved
 
 
-partTwo : () -> Maybe String
+partTwo : () -> Answer String
 partTwo =
     \_ ->
         idMatchFinder input
-            |> Just
+            |> Solved
 
 
 checksumTuple : String -> ( Int, Int )

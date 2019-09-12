@@ -1,5 +1,9 @@
 module Day16 exposing (partOne, partTwo)
 
+import Answer exposing (Answer(..))
+
+
+
 {--- Day 16: Chronal Classification ---
 
 As you see the Elves defend their hot chocolate successfully, you go back to falling through time.
@@ -4247,11 +4251,11 @@ After:  [1, 1, 2, 0]
     """
 
 
-partOne : () -> Maybe String
+partOne : () -> Answer String
 partOne _ =
-    Nothing
+    Unsolved
 
 
-partTwo : () -> Maybe String
+partTwo : () -> Answer String
 partTwo _ =
-    Nothing
+    Unsolved

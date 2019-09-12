@@ -1,5 +1,6 @@
 module Day11 exposing (calculateScore, empty, input, mapCoordinates, mapCoordinatesHelper, partOne, partTwo, scoreTotaller)
 
+import Answer exposing (Answer(..))
 import Matrix exposing (Coordinate, Matrix)
 
 
@@ -8,7 +9,7 @@ input =
     1308
 
 
-partOne : () -> Maybe String
+partOne : () -> Answer String
 partOne _ =
     let
         matrix =
@@ -16,11 +17,19 @@ partOne _ =
     in
     partOneHelper ( 0, 0 ) matrix Nothing
         |> Maybe.andThen (toString >> Just)
+        |> (\a ->
+                case a of
+                    Nothing ->
+                        Unsolved
+
+                    Just answer ->
+                        Solved answer
+           )
 
 
-partTwo : () -> Maybe String
+partTwo : () -> Answer String
 partTwo _ =
-    Nothing
+    Unsolved
 
 
 toString : Coordinate -> String

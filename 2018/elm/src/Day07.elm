@@ -1,21 +1,22 @@
 module Day07 exposing (alphabet, nextCharAvailable, partOne, partOneHelper, partTwo)
 
+import Answer exposing (Answer(..))
 import Day07.DataTypes exposing (Prerequisite)
 import Day07.Input exposing (input)
 
 
-partOne : () -> Maybe String
+partOne : () -> Answer String
 partOne =
     \_ ->
-        Just (partOneHelper alphabet input)
+        Solved (partOneHelper alphabet input)
 
 
-partTwo : () -> Maybe String
+partTwo : () -> Answer String
 partTwo =
     \_ ->
         partTwoHelper 0 alphabet input []
             |> String.fromInt
-            |> Just
+            |> Solved
 
 
 type alias Worker =

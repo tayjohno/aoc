@@ -1,5 +1,6 @@
 module Day10 exposing (partOne, partOneManual, partTwo)
 
+import Answer exposing (Answer(..))
 import Day10.Input exposing (..)
 import Matrix exposing (Matrix)
 
@@ -20,14 +21,14 @@ partOneManual =
         |> tryToRead
 
 
-partOne : () -> Maybe String
+partOne : () -> Answer String
 partOne _ =
-    Just "AHFGRKEE"
+    Solved "AHFGRKEE"
 
 
-partTwo : () -> Maybe String
+partTwo : () -> Answer String
 partTwo _ =
-    Nothing
+    Unsolved
 
 
 

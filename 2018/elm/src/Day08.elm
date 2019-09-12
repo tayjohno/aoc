@@ -1,5 +1,6 @@
 module Day08 exposing (partOne, partTwo, readNode, readNodes)
 
+import Answer exposing (Answer(..))
 import Day08.Input exposing (input)
 import Day08.Node as Node exposing (Node(..))
 
@@ -8,7 +9,7 @@ type alias MetadataNode =
     Node (List Int)
 
 
-partOne : () -> Maybe String
+partOne : () -> Answer String
 partOne =
     \_ ->
         readNode input
@@ -18,17 +19,17 @@ partOne =
             |> List.map (List.foldl (+) 0)
             |> List.foldl (+) 0
             |> String.fromInt
-            |> Just
+            |> Solved
 
 
-partTwo : () -> Maybe String
+partTwo : () -> Answer String
 partTwo =
     \_ ->
         readNode input
             |> Tuple.first
             |> nodeValue
             |> String.fromInt
-            |> Just
+            |> Solved
 
 
 readNodes : Int -> List Int -> ( List MetadataNode, List Int )

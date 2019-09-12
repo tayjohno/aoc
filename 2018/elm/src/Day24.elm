@@ -1,11 +1,13 @@
 module Day24 exposing (partOne, partTwo)
 
+import Answer exposing (Answer(..))
 
-partOne : () -> Maybe String
+
+partOne : () -> Answer String
 partOne _ =
-    Nothing
+    Unsolved
 
 
-partTwo : () -> Maybe String
+partTwo : () -> Answer String
 partTwo _ =
-    Nothing
+    Unsolved

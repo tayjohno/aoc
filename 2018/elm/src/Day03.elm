@@ -1,26 +1,27 @@
 module Day03 exposing (partOne, partTwo)
 
+import Answer exposing (Answer(..))
 import Array
 import Day03.Input exposing (Dimensions, Rectangle, input)
 import DynamicMatrix exposing (Coordinate, Matrix, get, set, transformElement)
 
 
-partOne : () -> Maybe String
+partOne : () -> Answer String
 partOne =
     \_ ->
         matrixSolution.data
             |> Array.toList
             |> countWhere 0 (\a -> a > 1)
             |> String.fromInt
-            |> Just
+            |> Solved
 
 
-partTwo : () -> Maybe String
+partTwo : () -> Answer String
 partTwo =
     \_ ->
         findUniqueRectangle input matrixSolution
             |> String.fromInt
-            |> Just
+            |> Solved
 
 
 findUniqueRectangle : List Rectangle -> Matrix Int -> Int

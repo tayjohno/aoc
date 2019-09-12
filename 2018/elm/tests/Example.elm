@@ -13,6 +13,7 @@ import Day10
 import Day11
 import Day12
 import Day13
+import Day14
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Test exposing (..)
@@ -92,5 +93,10 @@ suite =
             "Day13"
             [ test_answer "partOne" "82,104" Day13.partOne
             , test_answer "partTwo" "121,22" Day13.partTwo
+            ]
+        , describe
+            "Day14"
+            [ test_answer "partOne" "5115114101" Day14.partOne
+            , test_answer "partTwo" "20310465" Day14.partTwo
             ]
         ]

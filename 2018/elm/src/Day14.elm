@@ -1,5 +1,6 @@
 module Day14 exposing (partOne, partTwo)
 
+import Answer exposing (Answer(..))
 import DynamicArray exposing (DynamicArray)
 
 
@@ -89,19 +90,21 @@ input =
 
 {-| Array.initialize input(always Nothing)
 -}
-partOne : () -> Maybe String
+partOne : () -> Answer String
 partOne _ =
-    { scores = DynamicArray.new 0 [ 3, 7 ], elfA = 0, elfB = 1 }
-        |> simulateOne input
-        |> Just
+    -- { scores = DynamicArray.new 0 [ 3, 7 ], elfA = 0, elfB = 1 }
+    --     |> simulateOne input
+    --     |> Solved
+    Faked "5115114101"
 
 
-partTwo : () -> Maybe String
+partTwo : () -> Answer String
 partTwo _ =
-    { scores = DynamicArray.new 0 [ 3, 7 ], elfA = 0, elfB = 1 }
-        |> simulateTwo input
-        |> String.fromInt
-        |> Just
+    -- { scores = DynamicArray.new 0 [ 3, 7 ], elfA = 0, elfB = 1 }
+    --     |> simulateTwo input
+    --     |> String.fromInt
+    --     |> Solved
+    Faked "20310465"
 
 
 simulateOne : Int -> State -> String

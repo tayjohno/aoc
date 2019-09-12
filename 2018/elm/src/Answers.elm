@@ -1,5 +1,6 @@
 module Answers exposing (main)
 
+import Answer exposing (Answer(..))
 import Basics as Never exposing (Never)
 import Browser
 import Day01
@@ -44,9 +45,9 @@ type alias Day =
 
 
 type SolutionStatus
-    = Pending (() -> Maybe String)
-    | Solving (() -> Maybe String)
-    | Solved (Maybe String)
+    = Pending (() -> Answer String)
+    | Solving (() -> Answer String)
+    | Solved (Answer String)
 
 
 type Msg
@@ -76,7 +77,7 @@ init _ =
     )
 
 
-newDay : String -> (() -> Maybe String) -> (() -> Maybe String) -> Day
+newDay : String -> (() -> Answer String) -> (() -> Answer String) -> Day
 newDay name partOne partTwo =
     { name = name
     , partOne = Pending partOne
@@ -92,9 +93,9 @@ firstDay days =
         |> Maybe.withDefault (newDay "December One" Day01.partOne Day01.partTwo)
 
 
-notImplemented : () -> Maybe String
+notImplemented : () -> Answer String
 notImplemented _ =
-    Nothing
+    Unsolved
 
 
 initialConfiguration : List Day
@@ -321,18 +322,30 @@ solutionText solution =
             "Solving"
 
         Solved value ->
-            Maybe.withDefault "Nothing" value
+            case value of
+                Answer.Solved a ->
+                    a
+
+                Faked a ->
+                    a
+
+                Unsolved ->
+                    "UNSOLVED"
 
 
 solutionAttributes : SolutionStatus -> List (Html.Attribute msg)
 solutionAttributes solution =
     case solution of
         Solved value ->
-            if Nothing == value then
-                [ class "failed" ]
+            case value of
+                Answer.Solved a ->
+                    [ class "solved" ]
 
-            else
-                [ class "solved" ]
+                Faked a ->
+                    [ class "faked" ]
+
+                Unsolved ->
+                    [ class "failed" ]
 
         Pending _ ->
             [ class "pending" ]

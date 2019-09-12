@@ -1,10 +1,11 @@
 module Day05 exposing (partOne, partTwo)
 
+import Answer exposing (Answer(..))
 import Char exposing (Char)
 import Day05.Input exposing (input)
 
 
-partOne : () -> Maybe String
+partOne : () -> Answer String
 partOne =
     \_ ->
         input
@@ -12,10 +13,10 @@ partOne =
             |> partOneHelper
             |> List.length
             |> String.fromInt
-            |> Just
+            |> Solved
 
 
-partTwo : () -> Maybe String
+partTwo : () -> Answer String
 partTwo =
     \_ ->
         let
@@ -41,10 +42,10 @@ partTwo =
             |> (\i ->
                     case i of
                         Nothing ->
-                            Nothing
+                            Unsolved
 
                         Just int ->
-                            Just (String.fromInt int)
+                            Solved (String.fromInt int)
                )
 
 

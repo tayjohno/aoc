@@ -1,5 +1,9 @@
 module Day17 exposing (partOne, partTwo)
 
+import Answer exposing (Answer(..))
+
+
+
 {--- Day 17: Reservoir Research ---
 
 You arrive in the year 18. If it weren't for the coat you got in 1018, you would be very cold: the
@@ -2025,11 +2029,11 @@ y=524, x=623..630
     """
 
 
-partOne : () -> Maybe String
+partOne : () -> Answer String
 partOne _ =
-    Nothing
+    Unsolved
 
 
-partTwo : () -> Maybe String
+partTwo : () -> Answer String
 partTwo _ =
-    Nothing
+    Unsolved
