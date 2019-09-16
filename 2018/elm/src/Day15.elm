@@ -1,6 +1,8 @@
-module Day15 exposing (partOne, partTwo)
+module Day15 exposing (..)
 
 import Answer exposing (Answer(..))
+import Day15.Input exposing (..)
+import Matrix
 
 
 
@@ -340,9 +342,287 @@ Outcome: 20 * 937 = 18740
 
 partOne : () -> Answer String
 partOne _ =
-    Unsolved
+    simulateBattle input
+        |> always Unsolved
 
 
 partTwo : () -> Answer String
 partTwo _ =
     Unsolved
+
+
+allElves : Cave -> List ( Creature, Matrix.Coordinate )
+allElves cave =
+    cave
+        |> Matrix.findAll
+            (\tile ->
+                case tile of
+                    Open (Elf _) ->
+                        True
+
+                    _ ->
+                        False
+            )
+        |> List.map (\( tile, coordinate ) -> ( getCreature tile, coordinate ))
+        |> List.reverse
+
+
+allGoblins : Cave -> List ( Creature, Matrix.Coordinate )
+allGoblins cave =
+    cave
+        |> Matrix.findAll
+            (\tile ->
+                case tile of
+                    Open (Goblin _) ->
+                        True
+
+                    _ ->
+                        False
+            )
+        |> List.map (\( tile, coordinate ) -> ( getCreature tile, coordinate ))
+        |> List.reverse
+
+
+allCreatures : Cave -> List ( Creature, Matrix.Coordinate )
+allCreatures cave =
+    cave
+        |> Matrix.findAll
+            (\tile ->
+                case tile of
+                    Open Empty ->
+                        False
+
+                    Open _ ->
+                        True
+
+                    _ ->
+                        False
+            )
+        |> List.map (\( tile, coordinate ) -> ( getCreature tile, coordinate ))
+        |> List.reverse
+
+
+getCreature : Tile -> Creature
+getCreature tile =
+    case tile of
+        Open a ->
+            a
+
+        a ->
+            Debug.log "WTF?" a
+                |> Debug.todo "Impossible"
+
+
+simulateBattle : Cave -> Cave
+simulateBattle cave =
+    let
+        newCave =
+            cave
+                |> moveCreatures
+                |> attackCreatures
+                |> prettyPrintCave
+    in
+    if battleIsFinished newCave then
+        cave
+
+    else
+        simulateBattle newCave
+
+
+battleIsFinished : Cave -> Bool
+battleIsFinished cave =
+    False
+
+
+moveCreatures : Cave -> Cave
+moveCreatures cave =
+    cave
+        |> allCreatures
+        |> List.foldl moveCreature cave
+
+
+moveCreature : ( Creature, Matrix.Coordinate ) -> Cave -> Cave
+moveCreature ( creature, coordinate ) cave =
+    if besideEnemy creature coordinate cave then
+        -- Already next to enemy
+        cave
+
+    else
+        case pathToNearestEnemy cave ( creature, coordinate ) of
+            [] ->
+                -- No path to enemy
+                cave
+
+            next :: _ ->
+                -- Path to enemy found
+                moveCreatureToSpace ( creature, coordinate ) next cave
+
+
+moveCreatureToSpace : ( Creature, Matrix.Coordinate ) -> Matrix.Coordinate -> Cave -> Cave
+moveCreatureToSpace ( creature, currentPosition ) newPosition cave =
+    cave
+        |> ensure "Creature should be here." (\c -> Matrix.get currentPosition c == Just (Open creature))
+        |> Matrix.set currentPosition (Open Empty)
+        |> ensure "Space should be empty." (validMove newPosition)
+        |> Matrix.set newPosition (Open creature)
+
+
+{-| TODO: should return an empty array if no path can be found
+-}
+pathToNearestEnemy : Cave -> ( Creature, Matrix.Coordinate ) -> List Matrix.Coordinate
+pathToNearestEnemy cave ( creature, coordinate ) =
+    let
+        _ =
+            Debug.log "Searching from" creature
+
+        _ =
+            Debug.log "at" coordinate
+    in
+    depthFirstSearchForEnemy creature [] [ [ coordinate ] ] [ coordinate ] cave
+        |> Debug.log "pathToNearestEnemy"
+
+
+depthFirstSearchForEnemy : Creature -> List (List Matrix.Coordinate) -> List (List Matrix.Coordinate) -> List Matrix.Coordinate -> Cave -> List Matrix.Coordinate
+depthFirstSearchForEnemy creature checkedPaths uncheckedPaths checkedCoordinates cave =
+    case ( checkedPaths, uncheckedPaths ) of
+        ( [], [] ) ->
+            []
+
+        -- Searched this depth for all paths, try another layer
+        ( _, [] ) ->
+            depthFirstSearchForEnemy creature [] checkedPaths checkedCoordinates cave
+
+        ( _, headPath :: tailPaths ) ->
+            case headPath of
+                --|> Debug.log "pathToCheck"
+                [] ->
+                    Debug.todo "Shouldn't be possible"
+
+                searchFrom :: _ ->
+                    let
+                        possibleSteps =
+                            searchFrom
+                                -- all directions that aren't walls
+                                |> validMoves cave
+                                -- excluding those already searched
+                                |> List.filter (\move -> List.any ((==) move) checkedCoordinates |> not)
+
+                        -- |> Debug.log "PossibleSteps"
+                    in
+                    -- Found a monster?
+                    case List.filter (\coordinate -> besideEnemy creature coordinate cave) possibleSteps of
+                        -- No paths lead to monsters
+                        [] ->
+                            depthFirstSearchForEnemy creature (List.append checkedPaths (List.map (\a -> a :: headPath) possibleSteps)) tailPaths (List.append possibleSteps checkedCoordinates) cave
+
+                        -- Path leads to monster
+                        a :: _ ->
+                            List.reverse (a :: headPath) |> List.tail |> Maybe.withDefault []
+
+
+besideEnemy : Creature -> Matrix.Coordinate -> Cave -> Bool
+besideEnemy creature coordinate cave =
+    neighbors coordinate
+        |> List.any
+            ((\a -> Matrix.get a cave)
+                >> Maybe.withDefault Wall
+                >> creatureOn
+                >> isEnemyOf creature
+            )
+
+
+creatureOn : Tile -> Creature
+creatureOn tile =
+    case tile of
+        Wall ->
+            Empty
+
+        Open creature ->
+            creature
+
+
+creatureAt : Cave -> Matrix.Coordinate -> Creature
+creatureAt cave coordinate =
+    case Matrix.get coordinate cave of
+        Nothing ->
+            Empty
+
+        Just Wall ->
+            Empty
+
+        Just (Open creature) ->
+            creature
+
+
+isEnemyOf : Creature -> Creature -> Bool
+isEnemyOf creature creature2 =
+    case ( creature, creature2 ) of
+        ( Elf _, Goblin _ ) ->
+            True
+
+        ( Goblin _, Elf _ ) ->
+            True
+
+        ( _, _ ) ->
+            False
+
+
+neighbors : Matrix.Coordinate -> List Matrix.Coordinate
+neighbors coordinate =
+    [ up coordinate
+    , left coordinate
+    , right coordinate
+    , down coordinate
+    ]
+
+
+validMoves : Cave -> Matrix.Coordinate -> List Matrix.Coordinate
+validMoves cave coordinate =
+    coordinate
+        |> neighbors
+        |> List.filter (\c -> validMove c cave)
+
+
+validMove : Matrix.Coordinate -> Cave -> Bool
+validMove coordinate cave =
+    case Matrix.get coordinate cave of
+        Just (Open Empty) ->
+            True
+
+        _ ->
+            False
+
+
+ensure : String -> (a -> Bool) -> a -> a
+ensure message function a =
+    if function a then
+        a
+
+    else
+        Debug.todo message
+
+
+up : Matrix.Coordinate -> Matrix.Coordinate
+up ( x, y ) =
+    ( x, y - 1 )
+
+
+left : Matrix.Coordinate -> Matrix.Coordinate
+left ( x, y ) =
+    ( x - 1, y )
+
+
+right : Matrix.Coordinate -> Matrix.Coordinate
+right ( x, y ) =
+    ( x + 1, y )
+
+
+down : Matrix.Coordinate -> Matrix.Coordinate
+down ( x, y ) =
+    ( x, y + 1 )
+
+
+{-| TODO: This needs an implementation.
+-}
+attackCreatures =
+    identity

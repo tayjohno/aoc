@@ -1,4 +1,4 @@
-module Matrix exposing (Coordinate, Matrix, Size, allCoordinates, allCoordinatesHelper, customPrint, empty, fromRows, get, locations, prettyPrint, set, toRows, toString, transformElement)
+module Matrix exposing (Coordinate, Matrix, Size, allCoordinates, allCoordinatesHelper, customPrint, empty, findAll, fromRows, get, locations, prettyPrint, set, toRows, toString, transformElement)
 
 import Array exposing (Array)
 
@@ -145,6 +145,21 @@ allCoordinatesHelper index ( width, height ) =
         List.append (List.map (\a -> ( a, index )) (List.range 0 (width - 1))) (allCoordinatesHelper (index + 1) ( width, height ))
 
 
+findAll : (a -> Bool) -> Matrix a -> List ( a, Coordinate )
+findAll function matrix =
+    locations function matrix
+        |> List.map (\coordinate -> ( get coordinate matrix, coordinate ))
+        |> List.map
+            (\( maybeA, coordinate ) ->
+                case maybeA of
+                    Nothing ->
+                        Debug.todo "Coordinate out of range"
+
+                    Just a ->
+                        ( a, coordinate )
+            )
+
+
 toString : (a -> Char) -> Matrix a -> String
 toString coersion matrix =
     toStringHelper coersion (toRows matrix)
@@ -169,16 +184,16 @@ isWithin ( width, height ) ( x, y ) =
     x >= 0 && y >= 0 && x < width && y < height
 
 
-prettyPrint : Matrix a -> ()
+prettyPrint : Matrix a -> Matrix a
 prettyPrint matrix =
     matrix
         |> toRows
         |> List.reverse
         |> List.map (\a -> Debug.log "" a)
-        |> always ()
+        |> always matrix
 
 
-customPrint : (a -> Char) -> Matrix a -> ()
+customPrint : (a -> Char) -> Matrix a -> Matrix a
 customPrint function matrix =
     matrix
         |> toRows
@@ -186,7 +201,7 @@ customPrint function matrix =
         |> List.map (List.map function)
         |> List.map String.fromList
         |> List.map (Debug.log "")
-        |> always ()
+        |> always matrix
 
 
 
@@ -202,9 +217,9 @@ indexToCoordinate int { size } =
             size
 
         x =
-            int // width
+            remainderBy width int
 
         y =
-            remainderBy width int
+            int // width
     in
     ( x, y )

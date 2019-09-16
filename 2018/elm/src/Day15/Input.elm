@@ -52,8 +52,8 @@ rowParser =
     succeed identity
         |= Parser.loop [] rowHelper
         |. oneOf
-            [ succeed () |. token "\n" -- end of line
-            , succeed () -- end of file
+            [ succeed () |. token "\n"
+            , succeed ()
             ]
 
 
@@ -97,7 +97,7 @@ input =
             cave
 
 
-prettyPrintCave : Cave -> ()
+prettyPrintCave : Cave -> Cave
 prettyPrintCave =
     let
         toSym =
