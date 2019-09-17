@@ -1,5 +1,6 @@
 module Day15.Input exposing (..)
 
+import Day15.Creature exposing (Creature(..))
 import Matrix exposing (Matrix)
 import Parser exposing (..)
 
@@ -11,18 +12,6 @@ type alias Cave =
 type Tile
     = Open Creature
     | Wall
-
-
-type Creature
-    = Elf Stats
-    | Goblin Stats
-    | Empty
-
-
-type alias Stats =
-    { ap : Int
-    , hp : Int
-    }
 
 
 type alias Row =
@@ -95,27 +84,6 @@ input =
 
         Result.Ok cave ->
             cave
-
-
-prettyPrintCave : Cave -> Cave
-prettyPrintCave =
-    let
-        toSym =
-            \tile ->
-                case tile of
-                    Wall ->
-                        '#'
-
-                    Open (Goblin _) ->
-                        'G'
-
-                    Open (Elf _) ->
-                        'E'
-
-                    Open Empty ->
-                        '.'
-    in
-    Matrix.customPrint toSym
 
 
 rawInput : String

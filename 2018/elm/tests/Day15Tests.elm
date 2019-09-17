@@ -1,6 +1,7 @@
 module Day15Tests exposing (simulationTests)
 
 import Day15 exposing (..)
+import Day15.Creature exposing (..)
 import Day15.Input exposing (..)
 import Expect exposing (Expectation)
 import Fuzz exposing (..)
@@ -106,6 +107,92 @@ caveTestOrdering2 =
         |> toInput
 
 
+problemSampleCave1 =
+    """
+#######
+#.G...#
+#...EG#
+#.#.#G#
+#..G#E#
+#.....#
+#######
+    """
+        |> String.trim
+        |> toInput
+
+
+problemSampleCave2 =
+    """
+#######
+#G..#E#
+#E#E.E#
+#G.##.#
+#...#E#
+#...E.#
+#######
+    """
+        |> String.trim
+        |> toInput
+
+
+problemSampleCave3 =
+    """
+#######
+#E..EG#
+#.#G.E#
+#E.##E#
+#G..#.#
+#..E#.#
+#######
+    """
+        |> String.trim
+        |> toInput
+
+
+problemSampleCave4 =
+    """
+#######
+#E.G#.#
+#.#G..#
+#G.#.G#
+#G..#.#
+#...E.#
+#######
+    """
+        |> String.trim
+        |> toInput
+
+
+problemSampleCave5 =
+    """
+#######
+#.E...#
+#.#..G#
+#.###.#
+#E#G#G#
+#...#G#
+#######
+    """
+        |> String.trim
+        |> toInput
+
+
+problemSampleCave6 =
+    """
+#########
+#G......#
+#.E.#...#
+#..##..G#
+#...##..#
+#...#...#
+#.G...G.#
+#.....G.#
+#########
+    """
+        |> String.trim
+        |> toInput
+
+
 simulationTests =
     describe "simulation"
         [ describe "allCreatures"
@@ -197,6 +284,32 @@ simulationTests =
                 \_ ->
                     pathToNearestEnemy caveTestOrdering2 ( Elf startingStats, ( 3, 5 ) )
                         |> Expect.equalLists [ ( 3, 4 ), ( 2, 4 ), ( 1, 4 ), ( 1, 3 ), ( 1, 2 ), ( 1, 1 ), ( 2, 1 ) ]
+            ]
+        , describe "sanityCheck"
+            [ test "should solve example 1" <|
+                \_ ->
+                    simulateBattle 0 problemSampleCave1
+                        |> Expect.equal 27730
+            , test "should solve example 2" <|
+                \_ ->
+                    simulateBattle 0 problemSampleCave2
+                        |> Expect.equal 36334
+            , test "should solve example 3" <|
+                \_ ->
+                    simulateBattle 0 problemSampleCave3
+                        |> Expect.equal 39514
+            , test "should solve example 4" <|
+                \_ ->
+                    simulateBattle 0 problemSampleCave4
+                        |> Expect.equal 27755
+            , test "should solve example 5" <|
+                \_ ->
+                    simulateBattle 0 problemSampleCave5
+                        |> Expect.equal 28944
+            , test "should solve example 6" <|
+                \_ ->
+                    simulateBattle 0 problemSampleCave6
+                        |> Expect.equal 18740
             ]
         ]
 

@@ -1,5 +1,6 @@
 module Example exposing (suite)
 
+import Answer exposing (Answer(..))
 import Day01
 import Day02
 import Day03
@@ -19,11 +20,11 @@ import Fuzz exposing (Fuzzer, int, list, string)
 import Test exposing (..)
 
 
-test_answer : String -> String -> (() -> Maybe String) -> Test
+test_answer : String -> String -> (() -> Answer String) -> Test
 test_answer part expectation method =
     test part <|
         \_ ->
-            Expect.equal (Just expectation) (method ())
+            Expect.equal (Solved expectation) (method ())
 
 
 suite : Test
