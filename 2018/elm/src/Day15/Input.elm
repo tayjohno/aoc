@@ -1,21 +1,9 @@
 module Day15.Input exposing (..)
 
-import Day15.Creature exposing (Creature(..))
+import Day15.Cave as Cave exposing (Cave, Row, Tile(..))
+import Day15.Creature as Creature exposing (Class(..), Creature)
 import Matrix exposing (Matrix)
 import Parser exposing (..)
-
-
-type alias Cave =
-    Matrix Tile
-
-
-type Tile
-    = Open Creature
-    | Wall
-
-
-type alias Row =
-    List Tile
 
 
 caveParser : Parser Cave
@@ -60,16 +48,10 @@ tileParser : Parser Tile
 tileParser =
     oneOf
         [ succeed Wall |. token "#"
-        , succeed (Open Empty) |. token "."
-        , succeed (Open (Goblin startingStats)) |. token "G"
-        , succeed (Open (Elf startingStats)) |. token "E"
+        , succeed (Open Nothing) |. token "."
+        , succeed (Open (Just (Creature.init Goblin))) |. token "G"
+        , succeed (Open (Just (Creature.init Elf))) |. token "E"
         ]
-
-
-startingStats =
-    { ap = 3
-    , hp = 200
-    }
 
 
 input : Cave
@@ -123,3 +105,32 @@ rawInput =
 ################################
     """
         |> String.trim
+
+
+prettyPrintCave : Cave -> Cave
+prettyPrintCave cave =
+    let
+        toSym =
+            \tile ->
+                case tile of
+                    Wall ->
+                        '#'
+
+                    Open (Just { class }) ->
+                        case class of
+                            Goblin ->
+                                'G'
+
+                            Elf ->
+                                'E'
+
+                    Open Nothing ->
+                        '.'
+
+        _ =
+            Matrix.customPrint toSym cave
+
+        _ =
+            Debug.log "" (Cave.allCreatures cave)
+    in
+    cave

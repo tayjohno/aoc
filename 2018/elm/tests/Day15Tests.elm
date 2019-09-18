@@ -1,7 +1,8 @@
 module Day15Tests exposing (simulationTests)
 
 import Day15 exposing (..)
-import Day15.Creature exposing (..)
+import Day15.Cave as Cave
+import Day15.Creature as Creature exposing (Class(..), Creature)
 import Day15.Input exposing (..)
 import Expect exposing (Expectation)
 import Fuzz exposing (..)
@@ -195,94 +196,94 @@ problemSampleCave6 =
 
 simulationTests =
     describe "simulation"
-        [ describe "allCreatures"
+        [ describe "Cave.allCreatures"
             [ test "Should return all creatures in order (cave1)" <|
                 \_ ->
-                    allCreatures cave1
+                    Cave.allCreatures cave1
                         |> Expect.equalLists
-                            [ ( Elf { ap = 3, hp = 200 }, ( 1, 1 ) )
-                            , ( Goblin { ap = 3, hp = 200 }, ( 4, 1 ) )
-                            , ( Goblin { ap = 3, hp = 200 }, ( 2, 3 ) )
-                            , ( Goblin { ap = 3, hp = 200 }, ( 5, 3 ) )
+                            [ ( { class = Elf, ap = 3, hp = 200 }, ( 1, 1 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 4, 1 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 2, 3 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 5, 3 ) )
                             ]
             , test "Should return all creatures in order (cave2)" <|
                 \_ ->
-                    allCreatures cave2
+                    Cave.allCreatures cave2
                         |> Expect.equalLists
-                            [ ( Goblin { ap = 3, hp = 200 }, ( 1, 1 ) )
-                            , ( Goblin { ap = 3, hp = 200 }, ( 4, 1 ) )
-                            , ( Goblin { ap = 3, hp = 200 }, ( 7, 1 ) )
-                            , ( Goblin { ap = 3, hp = 200 }, ( 1, 4 ) )
-                            , ( Elf { ap = 3, hp = 200 }, ( 4, 4 ) )
-                            , ( Goblin { ap = 3, hp = 200 }, ( 7, 4 ) )
-                            , ( Goblin { ap = 3, hp = 200 }, ( 1, 7 ) )
-                            , ( Goblin { ap = 3, hp = 200 }, ( 4, 7 ) )
-                            , ( Goblin { ap = 3, hp = 200 }, ( 7, 7 ) )
+                            [ ( { class = Goblin, ap = 3, hp = 200 }, ( 1, 1 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 4, 1 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 7, 1 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 1, 4 ) )
+                            , ( { class = Elf, ap = 3, hp = 200 }, ( 4, 4 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 7, 4 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 1, 7 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 4, 7 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 7, 7 ) )
                             ]
             , test "Should handle empty caves (caveNoCreatures)" <|
                 \_ ->
-                    allCreatures caveNoCreatures
+                    Cave.allCreatures caveNoCreatures
                         |> Expect.equalLists []
             ]
-        , describe "allElves"
+        , describe "Cave.allElves"
             [ test "Should return all elves in order (cave1)" <|
                 \_ ->
-                    allElves cave1
+                    Cave.allElves cave1
                         |> Expect.equalLists
-                            [ ( Elf { ap = 3, hp = 200 }, ( 1, 1 ) ) ]
+                            [ ( { class = Elf, ap = 3, hp = 200 }, ( 1, 1 ) ) ]
             , test "Should return all elves in order (cave2)" <|
                 \_ ->
-                    allElves cave2
+                    Cave.allElves cave2
                         |> Expect.equalLists
-                            [ ( Elf { ap = 3, hp = 200 }, ( 4, 4 ) ) ]
+                            [ ( { class = Elf, ap = 3, hp = 200 }, ( 4, 4 ) ) ]
             , test "Should handle empty caves (caveNoCreatures)" <|
                 \_ ->
-                    allElves caveNoCreatures
+                    Cave.allElves caveNoCreatures
                         |> Expect.equalLists []
             ]
-        , describe "allGoblins"
+        , describe "Cave.allGoblins"
             [ test "Should return all creatures in order (cave1)" <|
                 \_ ->
-                    allGoblins cave1
+                    Cave.allGoblins cave1
                         |> Expect.equalLists
-                            [ ( Goblin { ap = 3, hp = 200 }, ( 4, 1 ) )
-                            , ( Goblin { ap = 3, hp = 200 }, ( 2, 3 ) )
-                            , ( Goblin { ap = 3, hp = 200 }, ( 5, 3 ) )
+                            [ ( { class = Goblin, ap = 3, hp = 200 }, ( 4, 1 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 2, 3 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 5, 3 ) )
                             ]
             , test "Should return all creatures in order (cave2)" <|
                 \_ ->
-                    allGoblins cave2
+                    Cave.allGoblins cave2
                         |> Expect.equalLists
-                            [ ( Goblin { ap = 3, hp = 200 }, ( 1, 1 ) )
-                            , ( Goblin { ap = 3, hp = 200 }, ( 4, 1 ) )
-                            , ( Goblin { ap = 3, hp = 200 }, ( 7, 1 ) )
-                            , ( Goblin { ap = 3, hp = 200 }, ( 1, 4 ) )
-                            , ( Goblin { ap = 3, hp = 200 }, ( 7, 4 ) )
-                            , ( Goblin { ap = 3, hp = 200 }, ( 1, 7 ) )
-                            , ( Goblin { ap = 3, hp = 200 }, ( 4, 7 ) )
-                            , ( Goblin { ap = 3, hp = 200 }, ( 7, 7 ) )
+                            [ ( { class = Goblin, ap = 3, hp = 200 }, ( 1, 1 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 4, 1 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 7, 1 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 1, 4 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 7, 4 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 1, 7 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 4, 7 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 7, 7 ) )
                             ]
             , test "Should handle empty caves (caveNoCreatures)" <|
                 \_ ->
-                    allGoblins caveNoCreatures
+                    Cave.allGoblins caveNoCreatures
                         |> Expect.equalLists []
             ]
         , describe "pathToNearestEnemy"
             [ test "Should handle unreachable enemies" <|
                 \_ ->
-                    pathToNearestEnemy caveNoPaths ( Elf startingStats, ( 1, 1 ) )
+                    pathToNearestEnemy caveNoPaths ( Creature.init Elf, ( 1, 1 ) )
                         |> Expect.equalLists []
             , test "Should handle a maze" <|
                 \_ ->
-                    pathToNearestEnemy caveMaze ( Elf startingStats, ( 1, 1 ) )
+                    pathToNearestEnemy caveMaze ( Creature.init Elf, ( 1, 1 ) )
                         |> Expect.equalLists [ ( 1, 2 ), ( 1, 3 ), ( 1, 4 ), ( 1, 5 ), ( 2, 5 ), ( 3, 5 ), ( 3, 4 ), ( 3, 3 ), ( 3, 2 ), ( 3, 1 ), ( 4, 1 ), ( 5, 1 ), ( 5, 2 ), ( 5, 3 ), ( 5, 4 ) ]
             , test "Should sort equal distance locations by reading order. (#1)" <|
                 \_ ->
-                    pathToNearestEnemy caveTestOrdering1 ( Elf startingStats, ( 4, 4 ) )
+                    pathToNearestEnemy caveTestOrdering1 ( Creature.init Elf, ( 4, 4 ) )
                         |> Expect.equalLists [ ( 4, 3 ), ( 5, 3 ), ( 5, 2 ) ]
             , test "Should sort equal distance locations by reading order. (#2)" <|
                 \_ ->
-                    pathToNearestEnemy caveTestOrdering2 ( Elf startingStats, ( 3, 5 ) )
+                    pathToNearestEnemy caveTestOrdering2 ( Creature.init Elf, ( 3, 5 ) )
                         |> Expect.equalLists [ ( 3, 4 ), ( 2, 4 ), ( 1, 4 ), ( 1, 3 ), ( 1, 2 ), ( 1, 1 ), ( 2, 1 ) ]
             ]
         , describe "sanityCheck"

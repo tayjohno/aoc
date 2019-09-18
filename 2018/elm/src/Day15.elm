@@ -1,7 +1,8 @@
 module Day15 exposing (..)
 
 import Answer exposing (Answer(..))
-import Day15.Creature exposing (Creature(..), Stats)
+import Day15.Cave as Cave exposing (Cave, Row, Tile(..))
+import Day15.Creature as Creature exposing (Class(..), Creature, CreatureCoordinate)
 import Day15.Input exposing (..)
 import Matrix
 
@@ -362,104 +363,69 @@ partTwo _ =
     Unsolved
 
 
-allElves : Cave -> List ( Creature, Matrix.Coordinate )
-allElves cave =
-    cave
-        |> Matrix.findAll
-            (\tile ->
-                case tile of
-                    Open (Elf _) ->
-                        True
-
-                    _ ->
-                        False
-            )
-        |> List.map (\( tile, coordinate ) -> ( getCreature tile, coordinate ))
-        |> List.reverse
-
-
-allGoblins : Cave -> List ( Creature, Matrix.Coordinate )
-allGoblins cave =
-    cave
-        |> Matrix.findAll
-            (\tile ->
-                case tile of
-                    Open (Goblin _) ->
-                        True
-
-                    _ ->
-                        False
-            )
-        |> List.map (\( tile, coordinate ) -> ( getCreature tile, coordinate ))
-        |> List.reverse
-
-
-allCreatures : Cave -> List ( Creature, Matrix.Coordinate )
-allCreatures cave =
-    cave
-        |> Matrix.findAll
-            (\tile ->
-                case tile of
-                    Open Empty ->
-                        False
-
-                    Open _ ->
-                        True
-
-                    _ ->
-                        False
-            )
-        |> List.map (\( tile, coordinate ) -> ( getCreature tile, coordinate ))
-        |> List.reverse
-
-
-getCreature : Tile -> Creature
-getCreature tile =
-    case tile of
-        Open a ->
-            a
-
-        a ->
-            Debug.log "WTF?" a
-                |> Debug.todo "Impossible"
-
-
 simulateBattle : Int -> Cave -> Int
 simulateBattle counter cave =
     let
+        newCave : Result Cave Cave
         newCave =
             cave
-                |> allCreatures
-                |> List.foldl
-                    (\creatureCoordinate foldCave ->
-                        {--
-                        This isn't sufficient, we need to ensure it's the _same_ creature which
-                        is alive in this coordinate
-                        --}
-                        if isDead (creatureAt cave (Tuple.second creatureCoordinate)) then
-                            foldCave
+                |> (Cave.allCreatures
+                        >> List.foldl
+                            (\creatureCoordinate resultCave ->
+                                case resultCave of
+                                    Err errCave ->
+                                        Err errCave
 
-                        else
-                            foldCave
-                                |> moveCreature creatureCoordinate
-                                |> (\( tmpCreatureCoordinate, tmpCave ) -> attackWith tmpCreatureCoordinate tmpCave)
-                    )
-                    cave
-                |> prettyPrintCave
+                                    Ok okCave ->
+                                        {--
+                            This isn't sufficient, we need to ensure it's the _same_ creature which
+                            is alive in this coordinate
+                            --}
+                                        if creatureCoordinate |> Tuple.second |> creatureAt okCave |> Maybe.map Creature.isDead |> Maybe.withDefault True then
+                                            resultCave
+
+                                        else
+                                            resultCave
+                                                |> Result.andThen (ensureEnemies creatureCoordinate)
+                                                |> Result.map (moveCreature creatureCoordinate)
+                                                |> Result.map (\( tmpCreatureCoordinate, tmpCave ) -> attackWith tmpCreatureCoordinate tmpCave)
+                            )
+                            (Ok cave)
+                   )
+                |> Result.map prettyPrintCave
     in
-    if battleIsFinished newCave then
-        counter * totalHP newCave
+    case newCave of
+        Err errCave ->
+            counter * totalHP errCave
 
-    else
-        simulateBattle (counter + 1) newCave
+        Ok okCave ->
+            simulateBattle (counter + 1) okCave
+
+
+ensureEnemies : CreatureCoordinate -> Cave -> Result Cave Cave
+ensureEnemies ( { class }, _ ) cave =
+    case class of
+        Elf ->
+            if cave |> Cave.allGoblins |> List.isEmpty then
+                Err cave
+
+            else
+                Ok cave
+
+        Goblin ->
+            if cave |> Cave.allElves |> List.isEmpty then
+                Err cave
+
+            else
+                Ok cave
 
 
 battleIsFinished : Cave -> Bool
 battleIsFinished cave =
-    (cave |> allElves |> List.isEmpty) || (cave |> allGoblins |> List.isEmpty)
+    (cave |> Cave.allElves |> List.isEmpty) || (cave |> Cave.allGoblins |> List.isEmpty)
 
 
-moveCreature : ( Creature, Matrix.Coordinate ) -> Cave -> ( ( Creature, Matrix.Coordinate ), Cave )
+moveCreature : CreatureCoordinate -> Cave -> ( CreatureCoordinate, Cave )
 moveCreature ( creature, coordinate ) cave =
     if besideEnemy creature coordinate cave then
         -- Already next to enemy
@@ -476,16 +442,16 @@ moveCreature ( creature, coordinate ) cave =
                 ( ( creature, next ), moveCreatureToSpace ( creature, coordinate ) next cave )
 
 
-moveCreatureToSpace : ( Creature, Matrix.Coordinate ) -> Matrix.Coordinate -> Cave -> Cave
+moveCreatureToSpace : CreatureCoordinate -> Matrix.Coordinate -> Cave -> Cave
 moveCreatureToSpace ( creature, currentPosition ) newPosition cave =
     cave
         -- |> ensure "Creature should be here." (\c -> (Matrix.get currentPosition c |> Debug.log "a") == (Just (Open creature) |> Debug.log "b"))
-        |> Matrix.set currentPosition (Open Empty)
+        |> Matrix.set currentPosition (Open Nothing)
         |> ensure "Space should be empty." (validMove newPosition)
-        |> Matrix.set newPosition (Open creature)
+        |> Matrix.set newPosition (Open (Just creature))
 
 
-pathToNearestEnemy : Cave -> ( Creature, Matrix.Coordinate ) -> List Matrix.Coordinate
+pathToNearestEnemy : Cave -> CreatureCoordinate -> List Matrix.Coordinate
 pathToNearestEnemy cave ( creature, coordinate ) =
     breadthFirstSearchForEnemy creature [] [ [ coordinate ] ] [ coordinate ] cave
         |> List.map List.reverse
@@ -493,33 +459,6 @@ pathToNearestEnemy cave ( creature, coordinate ) =
         |> List.map List.reverse
         |> List.head
         |> Maybe.withDefault []
-
-
-prettyPrintCave : Cave -> Cave
-prettyPrintCave cave =
-    let
-        toSym =
-            \tile ->
-                case tile of
-                    Wall ->
-                        '#'
-
-                    Open (Goblin _) ->
-                        'G'
-
-                    Open (Elf _) ->
-                        'E'
-
-                    Open Empty ->
-                        '.'
-
-        _ =
-            Matrix.customPrint toSym cave
-
-        _ =
-            Debug.log "" (allCreatures cave)
-    in
-    cave
 
 
 {-| Returns all shortest paths to a space next to an enemy
@@ -598,41 +537,32 @@ besideEnemy creature coordinate cave =
         |> List.any
             ((\a -> Matrix.get a cave)
                 >> Maybe.withDefault Wall
-                >> creatureOn
-                >> isEnemyOf creature
+                >> Cave.getCreature
+                >> Maybe.map (isEnemyOf creature)
+                >> Maybe.withDefault False
             )
 
 
-creatureOn : Tile -> Creature
-creatureOn tile =
-    case tile of
-        Wall ->
-            Empty
-
-        Open creature ->
-            creature
-
-
-creatureAt : Cave -> Matrix.Coordinate -> Creature
+creatureAt : Cave -> Matrix.Coordinate -> Maybe Creature
 creatureAt cave coordinate =
     case Matrix.get coordinate cave of
         Nothing ->
-            Empty
+            Nothing
 
         Just Wall ->
-            Empty
+            Nothing
 
         Just (Open creature) ->
             creature
 
 
 isEnemyOf : Creature -> Creature -> Bool
-isEnemyOf creature creature2 =
-    case ( creature, creature2 ) of
-        ( Elf _, Goblin _ ) ->
+isEnemyOf c1 c2 =
+    case ( c1.class, c2.class ) of
+        ( Elf, Goblin ) ->
             True
 
-        ( Goblin _, Elf _ ) ->
+        ( Goblin, Elf ) ->
             True
 
         ( _, _ ) ->
@@ -658,7 +588,7 @@ validMoves cave coordinate =
 validMove : Matrix.Coordinate -> Cave -> Bool
 validMove coordinate cave =
     case Matrix.get coordinate cave of
-        Just (Open Empty) ->
+        Just (Open Nothing) ->
             True
 
         _ ->
@@ -694,96 +624,53 @@ down ( x, y ) =
     ( x, y + 1 )
 
 
-nextCreatureToFight : ( Creature, Matrix.Coordinate ) -> Cave -> Maybe ( Creature, Matrix.Coordinate )
+nextCreatureToFight : CreatureCoordinate -> Cave -> Maybe CreatureCoordinate
 nextCreatureToFight ( creature, coordinate ) cave =
     neighbors coordinate
         |> List.map (\c -> ( creatureAt cave c, c ))
-        |> List.filter (\( cr, _ ) -> isEnemyOf creature cr)
-        |> List.sortBy getHP
+        |> List.filterMap
+            (\( maybeCr, co ) ->
+                case maybeCr of
+                    Nothing ->
+                        Nothing
+
+                    Just cr ->
+                        Just ( cr, co )
+            )
+        |> List.filter (Tuple.first >> isEnemyOf creature)
+        |> List.sortBy (Tuple.first >> .hp)
         |> List.head
 
 
-getHP : ( Creature, Matrix.Coordinate ) -> Int
-getHP ( creature, _ ) =
-    case creature of
-        Empty ->
-            0
-
-        Elf stats ->
-            stats.hp
-
-        Goblin stats ->
-            stats.hp
-
-
-
--- |> List.map (Maybe.andThen getCreature)
--- |> List.map (Maybe.withDefault |> Empty)
--- |> List.head
-
-
-attackWith : ( Creature, Matrix.Coordinate ) -> Cave -> Cave
-attackWith creature1 cave =
-    case nextCreatureToFight creature1 cave of
+attackWith : CreatureCoordinate -> Cave -> Cave
+attackWith creatureCoordinate1 cave =
+    case nextCreatureToFight creatureCoordinate1 cave of
         Nothing ->
             cave
 
-        Just creature2 ->
-            attack creature2 cave
+        Just creatureCoordinate2 ->
+            attack (creatureCoordinate1 |> Tuple.first |> .ap) creatureCoordinate2 cave
 
 
-attack : ( Creature, Matrix.Coordinate ) -> Cave -> Cave
-attack ( creature, coordinate ) cave =
+attack : Int -> CreatureCoordinate -> Cave -> Cave
+attack ap ( creature, coordinate ) cave =
     let
         updatedCreature =
-            case creature of
-                Elf stats ->
-                    Elf { stats | hp = stats.hp - 3 }
-
-                Goblin stats ->
-                    Goblin { stats | hp = stats.hp - 3 }
-
-                Empty ->
-                    Empty
+            { creature | hp = creature.hp - 3 }
     in
-    if isDead updatedCreature then
-        cave |> Matrix.set coordinate (Open Empty)
+    cave
+        |> Matrix.set coordinate
+            (if Creature.isDead updatedCreature then
+                Open Nothing
 
-    else
-        cave |> Matrix.set coordinate (Open updatedCreature)
-
-
-isDead : Creature -> Bool
-isDead creature =
-    case creature of
-        Elf stats ->
-            stats.hp <= 0
-
-        Goblin stats ->
-            stats.hp <= 0
-
-        Empty ->
-            True
+             else
+                Open (Just updatedCreature)
+            )
 
 
 totalHP : Cave -> Int
 totalHP cave =
-    allCreatures cave
+    Cave.allCreatures cave
         |> List.map Tuple.first
-        |> List.map
-            (\cr ->
-                case cr of
-                    Empty ->
-                        0
-
-                    Elf { hp } ->
-                        hp
-
-                    Goblin { hp } ->
-                        hp
-            )
+        |> List.map .hp
         |> List.sum
-
-
-
--- { creature2 | hp -= 3 }
