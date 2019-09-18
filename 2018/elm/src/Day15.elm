@@ -351,19 +351,60 @@ Outcome: 20 * 937 = 18740
 -}
 
 
+type alias BattleResult =
+    { winningClass : Class
+    , cave : Cave
+    , score : Int
+    }
+
+
 partOne : () -> Answer String
 partOne _ =
     simulateBattle 0 input
+        |> .score
         |> String.fromInt
         |> Solved
 
 
+{-| 38064 is too high...
+10146 is too low (minimum for elves winning)
+-}
 partTwo : () -> Answer String
 partTwo _ =
-    Unsolved
+    simulateElvesWinning 3 input
+        |> .score
+        |> String.fromInt
+        |> Solved
 
 
-simulateBattle : Int -> Cave -> Int
+simulateElvesWinning : Int -> Cave -> BattleResult
+simulateElvesWinning ap cave =
+    let
+        startingElfCount =
+            cave |> Cave.allElves |> List.length
+
+        battleResult =
+            simulateBattle 0 (buffElves ap cave)
+    in
+    if (battleResult.cave |> Cave.allElves |> List.length) == startingElfCount then
+        battleResult
+
+    else
+        simulateElvesWinning (ap + 1) cave
+
+
+buffElves : Int -> Cave -> Cave
+buffElves newAP cave =
+    cave
+        |> Cave.allElves
+        |> List.foldl
+            (\( elf, coordinate ) tmpCave ->
+                Matrix.set coordinate (Open (Just { elf | ap = newAP })) tmpCave
+            )
+            cave
+
+
+simulateBattle : Int -> Cave -> BattleResult
 simulateBattle counter cave =
     let
         newCave : Result Cave Cave
@@ -392,11 +433,20 @@ simulateBattle counter cave =
                             )
                             (Ok cave)
                    )
-                |> Result.map prettyPrintCave
+
+        -- |> Result.map prettyPrintCave
     in
     case newCave of
         Err errCave ->
-            counter * totalHP errCave
+            let
+                winningClass =
+                    if Cave.allElves errCave |> List.isEmpty then
+                        Goblin
+
+                    else
+                        Elf
+            in
+            { winningClass = winningClass, cave = cave, score = counter * totalHP (errCave |> prettyPrintCave) }
 
         Ok okCave ->
             simulateBattle (counter + 1) okCave
@@ -656,7 +706,7 @@ attack : Int -> CreatureCoordinate -> Cave -> Cave
 attack ap ( creature, coordinate ) cave =
     let
         updatedCreature =
-            { creature | hp = creature.hp - 3 }
+            { creature | hp = creature.hp - ap }
     in
     cave
         |> Matrix.set coordinate

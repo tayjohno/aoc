@@ -290,27 +290,58 @@ simulationTests =
             [ test "should solve example 1" <|
                 \_ ->
                     simulateBattle 0 problemSampleCave1
+                        |> .score
                         |> Expect.equal 27730
             , test "should solve example 2" <|
                 \_ ->
                     simulateBattle 0 problemSampleCave2
+                        |> .score
                         |> Expect.equal 36334
             , test "should solve example 3" <|
                 \_ ->
                     simulateBattle 0 problemSampleCave3
+                        |> .score
                         |> Expect.equal 39514
             , test "should solve example 4" <|
                 \_ ->
                     simulateBattle 0 problemSampleCave4
+                        |> .score
                         |> Expect.equal 27755
             , test "should solve example 5" <|
                 \_ ->
                     simulateBattle 0 problemSampleCave5
+                        |> .score
                         |> Expect.equal 28944
             , test "should solve example 6" <|
                 \_ ->
                     simulateBattle 0 problemSampleCave6
+                        |> .score
                         |> Expect.equal 18740
+            , test "should simulateElvesWinning example 1" <|
+                \_ ->
+                    simulateElvesWinning 3 problemSampleCave1
+                        |> .score
+                        |> Expect.equal 4988
+            , test "should simulateElvesWinning example 3" <|
+                \_ ->
+                    simulateElvesWinning 3 problemSampleCave3
+                        |> .score
+                        |> Expect.equal 31284
+            , test "should simulateElvesWinning example 4" <|
+                \_ ->
+                    simulateElvesWinning 3 problemSampleCave4
+                        |> .score
+                        |> Expect.equal 3478
+            , test "should simulateElvesWinning example 5" <|
+                \_ ->
+                    simulateElvesWinning 3 problemSampleCave5
+                        |> .score
+                        |> Expect.equal 6474
+            , test "should simulateElvesWinning example 6" <|
+                \_ ->
+                    simulateElvesWinning 3 problemSampleCave6
+                        |> .score
+                        |> Expect.equal 1140
             ]
         ]
 
