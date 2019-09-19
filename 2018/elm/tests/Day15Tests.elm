@@ -3,11 +3,47 @@ module Day15Tests exposing (simulationTests)
 import Day15 exposing (..)
 import Day15.Cave as Cave
 import Day15.Creature as Creature exposing (Class(..), Creature)
-import Day15.Input exposing (..)
+import Day15.Input as Input exposing (..)
 import Expect exposing (Expectation)
 import Fuzz exposing (..)
 import Parser
 import Test exposing (..)
+
+
+onlineSample1 =
+    """
+#######
+#######
+#.E..G#
+#.#####
+#G#####
+#######
+#######
+    """
+        |> String.trim
+        |> Input.newCave
+
+
+onlineSample2 =
+    """
+####
+#GG#
+#.E#
+####
+    """
+        |> String.trim
+        |> Input.newCave
+
+
+onlineSample3 =
+    """
+########
+#..E..G#
+#G######
+########
+    """
+        |> String.trim
+        |> Input.newCave
 
 
 cave1 =
@@ -19,7 +55,7 @@ cave1 =
 #######
     """
         |> String.trim
-        |> toInput
+        |> Input.newCave
 
 
 cave2 =
@@ -35,7 +71,7 @@ cave2 =
 #########
    """
         |> String.trim
-        |> toInput
+        |> Input.newCave
 
 
 caveNoCreatures =
@@ -45,7 +81,7 @@ caveNoCreatures =
 ###
     """
         |> String.trim
-        |> toInput
+        |> Input.newCave
 
 
 {-| The top left elf should not be able to generate a path to any of these enemies.
@@ -61,7 +97,7 @@ caveNoPaths =
 #######
     """
         |> String.trim
-        |> toInput
+        |> Input.newCave
 
 
 {-| The top left elf should be able to find a path through the maze
@@ -77,7 +113,7 @@ caveMaze =
 #######
     """
         |> String.trim
-        |> toInput
+        |> Input.newCave
 
 
 caveTestOrdering1 =
@@ -91,7 +127,7 @@ caveTestOrdering1 =
 #######
     """
         |> String.trim
-        |> toInput
+        |> Input.newCave
 
 
 caveTestOrdering2 =
@@ -105,7 +141,7 @@ caveTestOrdering2 =
 #######
     """
         |> String.trim
-        |> toInput
+        |> Input.newCave
 
 
 problemSampleCave1 =
@@ -119,7 +155,7 @@ problemSampleCave1 =
 #######
     """
         |> String.trim
-        |> toInput
+        |> Input.newCave
 
 
 problemSampleCave2 =
@@ -133,7 +169,7 @@ problemSampleCave2 =
 #######
     """
         |> String.trim
-        |> toInput
+        |> Input.newCave
 
 
 problemSampleCave3 =
@@ -147,7 +183,7 @@ problemSampleCave3 =
 #######
     """
         |> String.trim
-        |> toInput
+        |> Input.newCave
 
 
 problemSampleCave4 =
@@ -161,7 +197,7 @@ problemSampleCave4 =
 #######
     """
         |> String.trim
-        |> toInput
+        |> Input.newCave
 
 
 problemSampleCave5 =
@@ -175,7 +211,7 @@ problemSampleCave5 =
 #######
     """
         |> String.trim
-        |> toInput
+        |> Input.newCave
 
 
 problemSampleCave6 =
@@ -191,7 +227,7 @@ problemSampleCave6 =
 #########
     """
         |> String.trim
-        |> toInput
+        |> Input.newCave
 
 
 simulationTests =
@@ -201,24 +237,24 @@ simulationTests =
                 \_ ->
                     Cave.allCreatures cave1
                         |> Expect.equalLists
-                            [ ( { class = Elf, ap = 3, hp = 200 }, ( 1, 1 ) )
-                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 4, 1 ) )
-                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 2, 3 ) )
-                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 5, 3 ) )
+                            [ ( { class = Elf, ap = 3, hp = 200, startingCoordinate = ( 1, 1 ) }, ( 1, 1 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 4, 1 ) }, ( 4, 1 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 2, 3 ) }, ( 2, 3 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 5, 3 ) }, ( 5, 3 ) )
                             ]
             , test "Should return all creatures in order (cave2)" <|
                 \_ ->
                     Cave.allCreatures cave2
                         |> Expect.equalLists
-                            [ ( { class = Goblin, ap = 3, hp = 200 }, ( 1, 1 ) )
-                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 4, 1 ) )
-                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 7, 1 ) )
-                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 1, 4 ) )
-                            , ( { class = Elf, ap = 3, hp = 200 }, ( 4, 4 ) )
-                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 7, 4 ) )
-                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 1, 7 ) )
-                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 4, 7 ) )
-                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 7, 7 ) )
+                            [ ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 1, 1 ) }, ( 1, 1 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 4, 1 ) }, ( 4, 1 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 7, 1 ) }, ( 7, 1 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 1, 4 ) }, ( 1, 4 ) )
+                            , ( { class = Elf, ap = 3, hp = 200, startingCoordinate = ( 4, 4 ) }, ( 4, 4 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 7, 4 ) }, ( 7, 4 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 1, 7 ) }, ( 1, 7 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 4, 7 ) }, ( 4, 7 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 7, 7 ) }, ( 7, 7 ) )
                             ]
             , test "Should handle empty caves (caveNoCreatures)" <|
                 \_ ->
@@ -230,12 +266,12 @@ simulationTests =
                 \_ ->
                     Cave.allElves cave1
                         |> Expect.equalLists
-                            [ ( { class = Elf, ap = 3, hp = 200 }, ( 1, 1 ) ) ]
+                            [ ( { class = Elf, ap = 3, hp = 200, startingCoordinate = ( 1, 1 ) }, ( 1, 1 ) ) ]
             , test "Should return all elves in order (cave2)" <|
                 \_ ->
                     Cave.allElves cave2
                         |> Expect.equalLists
-                            [ ( { class = Elf, ap = 3, hp = 200 }, ( 4, 4 ) ) ]
+                            [ ( { class = Elf, ap = 3, hp = 200, startingCoordinate = ( 4, 4 ) }, ( 4, 4 ) ) ]
             , test "Should handle empty caves (caveNoCreatures)" <|
                 \_ ->
                     Cave.allElves caveNoCreatures
@@ -246,22 +282,22 @@ simulationTests =
                 \_ ->
                     Cave.allGoblins cave1
                         |> Expect.equalLists
-                            [ ( { class = Goblin, ap = 3, hp = 200 }, ( 4, 1 ) )
-                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 2, 3 ) )
-                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 5, 3 ) )
+                            [ ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 4, 1 ) }, ( 4, 1 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 2, 3 ) }, ( 2, 3 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 5, 3 ) }, ( 5, 3 ) )
                             ]
             , test "Should return all creatures in order (cave2)" <|
                 \_ ->
                     Cave.allGoblins cave2
                         |> Expect.equalLists
-                            [ ( { class = Goblin, ap = 3, hp = 200 }, ( 1, 1 ) )
-                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 4, 1 ) )
-                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 7, 1 ) )
-                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 1, 4 ) )
-                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 7, 4 ) )
-                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 1, 7 ) )
-                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 4, 7 ) )
-                            , ( { class = Goblin, ap = 3, hp = 200 }, ( 7, 7 ) )
+                            [ ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 1, 1 ) }, ( 1, 1 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 4, 1 ) }, ( 4, 1 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 7, 1 ) }, ( 7, 1 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 1, 4 ) }, ( 1, 4 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 7, 4 ) }, ( 7, 4 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 1, 7 ) }, ( 1, 7 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 4, 7 ) }, ( 4, 7 ) )
+                            , ( { class = Goblin, ap = 3, hp = 200, startingCoordinate = ( 7, 7 ) }, ( 7, 7 ) )
                             ]
             , test "Should handle empty caves (caveNoCreatures)" <|
                 \_ ->
@@ -285,6 +321,18 @@ simulationTests =
                 \_ ->
                     pathToNearestEnemy caveTestOrdering2 ( Creature.init Elf, ( 3, 5 ) )
                         |> Expect.equalLists [ ( 3, 4 ), ( 2, 4 ), ( 1, 4 ), ( 1, 3 ), ( 1, 2 ), ( 1, 1 ), ( 2, 1 ) ]
+            , test "online sample 1" <|
+                \_ ->
+                    pathToNearestEnemy onlineSample1 ( Creature.init Elf, ( 2, 2 ) )
+                        |> Expect.equalLists [ ( 3, 2 ), ( 4, 2 ) ]
+            , test "online sample 2" <|
+                \_ ->
+                    moveCreature ( Creature.init Elf, ( 2, 2 ) ) onlineSample2
+                        |> (\( ( _, newCoordinate ), _ ) -> Expect.equal ( 2, 2 ) newCoordinate)
+            , test "online sample 3" <|
+                \_ ->
+                    pathToNearestEnemy onlineSample3 ( Creature.init Elf, ( 2, 2 ) )
+                        |> Expect.equalLists [ ( 2, 1 ), ( 1, 1 ) ]
             ]
         , describe "sanityCheck"
             [ test "should solve example 1" <|
@@ -344,16 +392,3 @@ simulationTests =
                         |> Expect.equal 1140
             ]
         ]
-
-
-toInput i =
-    let
-        parsedCave =
-            Parser.run caveParser i
-    in
-    case parsedCave of
-        Result.Err _ ->
-            Debug.todo "Couldn't parse a map"
-
-        Result.Ok cave ->
-            cave

@@ -361,17 +361,16 @@ type alias BattleResult =
 partOne : () -> Answer String
 partOne _ =
     simulateBattle 0 input
+        -- |> (\result -> prettyPrintCave result.cave |> always result)
         |> .score
         |> String.fromInt
         |> Solved
 
 
-{-| 38064 is too high...
-10146 is too low (minimum for elves winning)
--}
 partTwo : () -> Answer String
 partTwo _ =
     simulateElvesWinning 3 input
+        -- |> (\result -> prettyPrintCave result.cave |> always result)
         |> .score
         |> String.fromInt
         |> Solved
@@ -418,11 +417,7 @@ simulateBattle counter cave =
                                         Err errCave
 
                                     Ok okCave ->
-                                        {--
-                            This isn't sufficient, we need to ensure it's the _same_ creature which
-                            is alive in this coordinate
-                            --}
-                                        if creatureCoordinate |> Tuple.second |> creatureAt okCave |> Maybe.map Creature.isDead |> Maybe.withDefault True then
+                                        if Cave.isDead creatureCoordinate okCave then
                                             resultCave
 
                                         else
@@ -433,8 +428,6 @@ simulateBattle counter cave =
                             )
                             (Ok cave)
                    )
-
-        -- |> Result.map prettyPrintCave
     in
     case newCave of
         Err errCave ->
@@ -446,7 +439,7 @@ simulateBattle counter cave =
                     else
                         Elf
             in
-            { winningClass = winningClass, cave = cave, score = counter * totalHP (errCave |> prettyPrintCave) }
+            { winningClass = winningClass, cave = errCave, score = counter * totalHP errCave }
 
         Ok okCave ->
             simulateBattle (counter + 1) okCave
@@ -494,11 +487,14 @@ moveCreature ( creature, coordinate ) cave =
 
 moveCreatureToSpace : CreatureCoordinate -> Matrix.Coordinate -> Cave -> Cave
 moveCreatureToSpace ( creature, currentPosition ) newPosition cave =
+    let
+        creatureToMove =
+            Matrix.get currentPosition cave |> Maybe.withDefault (Open Nothing)
+    in
     cave
-        -- |> ensure "Creature should be here." (\c -> (Matrix.get currentPosition c |> Debug.log "a") == (Just (Open creature) |> Debug.log "b"))
         |> Matrix.set currentPosition (Open Nothing)
         |> ensure "Space should be empty." (validMove newPosition)
-        |> Matrix.set newPosition (Open (Just creature))
+        |> Matrix.set newPosition creatureToMove
 
 
 pathToNearestEnemy : Cave -> CreatureCoordinate -> List Matrix.Coordinate

@@ -54,18 +54,34 @@ tileParser =
         ]
 
 
-input : Cave
-input =
+setInitialCoordinates : Cave -> Cave
+setInitialCoordinates cave =
+    cave
+        |> Cave.allCreatures
+        |> List.foldl
+            (\( creature, coordinate ) foldCave ->
+                Matrix.set coordinate (Open (Just { creature | startingCoordinate = coordinate })) foldCave
+            )
+            cave
+
+
+newCave : String -> Cave
+newCave string =
     let
         parsedCave =
-            run caveParser rawInput
+            run caveParser string
     in
     case parsedCave of
         Result.Err _ ->
             Debug.todo "Couldn't parse a map"
 
         Result.Ok cave ->
-            cave
+            cave |> setInitialCoordinates
+
+
+input : Cave
+input =
+    newCave rawInput
 
 
 rawInput : String
@@ -131,6 +147,18 @@ prettyPrintCave cave =
             Matrix.customPrint toSym cave
 
         _ =
-            Debug.log "" (Cave.allCreatures cave)
+            Cave.allCreatures cave
+                |> List.reverse
+                |> List.map
+                    (\( creature, coordinate ) ->
+                        [ Tuple.second coordinate, Tuple.first coordinate, creature.hp ]
+                            |> Debug.log
+                                (if creature.class == Elf then
+                                    "elf"
+
+                                 else
+                                    "gob"
+                                )
+                    )
     in
     cave

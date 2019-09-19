@@ -1,12 +1,14 @@
 module Day15.Creature exposing (Class(..), Creature, CreatureCoordinate, init, isDead)
 
 import Matrix
+import Random
 
 
 type alias Creature =
     { class : Class
     , ap : Int
     , hp : Int
+    , startingCoordinate : Matrix.Coordinate
     }
 
 
@@ -29,4 +31,5 @@ init class =
     { class = class
     , ap = 3
     , hp = 200
+    , startingCoordinate = ( 0, 0 )
     }
