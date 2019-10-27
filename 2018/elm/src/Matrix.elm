@@ -98,15 +98,13 @@ toRows matrix =
         ( width, height ) =
             matrix.size
     in
-    if height == 0 then
-        []
+    toRowsOfWidth width matrix.data
 
-    else
-        List.take width (Array.toList matrix.data)
-            :: toRows
-                { data = Array.fromList (List.drop width (Array.toList matrix.data))
-                , size = ( width, height - 1 )
-                }
+
+toRowsOfWidth : Int -> Array a -> List (List a)
+toRowsOfWidth width data =
+    Array.toList (Array.slice 0 width data)
+        :: toRowsOfWidth width (Array.slice width (Array.length data) data)
 
 
 fromRows : List (List a) -> a -> Matrix a
@@ -193,19 +191,52 @@ prettyPrint matrix =
         |> always matrix
 
 
+{-| A compact way to print out any matrix.
+
+Must provide a way to map any instance of `a` to a single character.
+
+-}
 customPrint : (a -> Char) -> Matrix a -> Matrix a
 customPrint function matrix =
     matrix
-        |> toRows
-        |> List.reverse
-        |> List.map (List.map function)
-        |> List.map String.fromList
-        |> List.map (Debug.log "")
+        |> customPrintHelper function "" 0
         |> always matrix
 
 
 
 -- PRIVATE METHODS
+
+
+customPrintHelper : (a -> Char) -> String -> Int -> Matrix a -> Matrix a
+customPrintHelper function row index matrix =
+    let
+        ( width, height ) =
+            matrix.size
+    in
+    if index >= width * height then
+        Debug.log "" row |> always matrix
+
+    else if modBy width index == 0 then
+        let
+            _ =
+                if index /= 0 then
+                    Just (Debug.log "" row)
+
+                else
+                    Nothing
+        in
+        customPrintHelper
+            function
+            ""
+            (index + 1)
+            matrix
+
+    else
+        customPrintHelper
+            function
+            (Array.get index matrix.data |> Maybe.map function |> Maybe.withDefault ' ' |> String.fromChar |> String.append row)
+            (index + 1)
+            matrix
 
 
 {-| Convert an array index to a coordinate.
