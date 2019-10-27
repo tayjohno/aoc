@@ -241,7 +241,7 @@ flowOneStep flowCoordinate inputMap =
         newMap =
             Matrix.set flowCoordinate (Water Flowing) inputMap
     in
-    if (nextCoordinates == []) && (flowCoordinate |> canOverflow inputMap) then
+    if flowCoordinate |> canOverflow inputMap then
         overflow flowCoordinate newMap
 
     else
