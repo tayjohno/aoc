@@ -191,8 +191,8 @@ partOne _ =
         ( inputMap, inputFlows ) =
             input
 
-        _ =
-            inputMap |> .size |> Debug.log "size"
+        -- _ =
+        -- inputMap |> .size |> Debug.log "size"
     in
     partOneHelper inputMap inputFlows
         |> countAllWater
@@ -202,13 +202,10 @@ partOne _ =
 
 partOneHelper : Map -> List Coordinate -> Map
 partOneHelper inputMap flows =
-    let
-        _ =
-            Debug.log "flowing to..." flows
-
-        _ =
-            prettyPrintMap inputMap
-    in
+    -- let
+    -- _ =
+    -- Debug.log "flowing to..." flows
+    -- in
     case flows of
         [] ->
             inputMap
@@ -216,7 +213,7 @@ partOneHelper inputMap flows =
         nextFlow :: tail ->
             inputMap
                 |> flowOneStep nextFlow
-                |> (\( m, l ) -> partOneHelper m (List.append l tail))
+                |> (\( m, l ) -> partOneHelper m (List.append tail l))
 
 
 flowOneStep : Coordinate -> Map -> ( Map, List Coordinate )
@@ -258,7 +255,7 @@ overflow coordinate map =
         {- ! find the left most point of the curently pooling water -}
         leftmost : Coordinate -> Coordinate
         leftmost c =
-            if c |> Debug.log "leftmost" |> left |> isSolid map then
+            if c |> left |> isSolid map then
                 c
 
             else
@@ -337,8 +334,7 @@ isSolid map coord =
 
 canOverflow : Map -> Coordinate -> Bool
 canOverflow map coordinate =
-    (walledToLeft map coordinate && walledToRight map coordinate)
-        |> Debug.log "canOverflow?"
+    walledToLeft map coordinate && walledToRight map coordinate
 
 
 walledToLeft : Map -> Coordinate -> Bool
