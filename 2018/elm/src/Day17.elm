@@ -191,9 +191,6 @@ partOne _ =
     let
         ( inputMap, inputFlows ) =
             input
-
-        _ =
-            inputMap |> .size |> Debug.log "size"
     in
     partOneHelper ( inputMap, inputFlows )
         |> countAllWater
@@ -392,9 +389,6 @@ partTwo _ =
     let
         ( inputMap, inputFlows ) =
             input
-
-        _ =
-            inputMap |> .size |> Debug.log "size"
     in
     partOneHelper ( inputMap, inputFlows )
         |> countAllSettledWater
