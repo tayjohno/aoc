@@ -195,18 +195,18 @@ partOne _ =
         _ =
             inputMap |> .size |> Debug.log "size"
     in
-    partOneHelper inputMap inputFlows
+    partOneHelper ( inputMap, inputFlows )
         |> countAllWater
         |> String.fromInt
         |> Solved
 
 
-partOneHelper : Map -> List Coordinate -> Map
-partOneHelper inputMap flows =
+partOneHelper : ( Map, List Coordinate ) -> Map
+partOneHelper ( inputMap, flows ) =
     let
-        _ =
-            Debug.log "flowing to..." flows
-
+        -- _ =
+        --     Debug.log "flowing to..." flows
+        --
         sortAndFilter =
             List.map (\( a, b ) -> ( b, a ))
                 >> Set.fromList
@@ -218,17 +218,15 @@ partOneHelper inputMap flows =
             inputMap
 
         nextFlow :: tail ->
-            inputMap
-                |> flowOneStep nextFlow
-                |> (\( m, l ) -> partOneHelper m (List.append tail l |> sortAndFilter))
+            partOneHelper (Tuple.mapSecond (List.append tail >> sortAndFilter) (flowOneStep nextFlow inputMap))
 
 
 flowOneStep : Coordinate -> Map -> ( Map, List Coordinate )
 flowOneStep flowCoordinate inputMap =
     let
-        ( x, y ) =
-            flowCoordinate |> Debug.log "flowing to"
-
+        -- ( x, y ) =
+        --     flowCoordinate |> Debug.log "flowing to"
+        --
         nextCoordinates =
             if flowCoordinate |> down |> isValidFlow inputMap then
                 [ flowCoordinate |> down ]
@@ -391,4 +389,21 @@ countAllWater map =
 
 partTwo : () -> Answer String
 partTwo _ =
-    Unsolved
+    let
+        ( inputMap, inputFlows ) =
+            input
+
+        _ =
+            inputMap |> .size |> Debug.log "size"
+    in
+    partOneHelper ( inputMap, inputFlows )
+        |> countAllSettledWater
+        |> String.fromInt
+        |> Solved
+
+
+countAllSettledWater : Map -> Int
+countAllSettledWater map =
+    map
+        |> Matrix.locations ((==) (Water Settled))
+        |> List.length
