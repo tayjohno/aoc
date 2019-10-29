@@ -1,8 +1,9 @@
 module Day17 exposing (partOne, partTwo)
 
 import Answer exposing (Answer(..))
+import Array2DMatrix as Matrix exposing (Coordinate)
 import Day17.Input exposing (Map, Tile(..), WaterStatus(..), input, prettyPrintMap)
-import Matrix as Matrix exposing (Coordinate)
+import Set
 
 
 
@@ -191,8 +192,8 @@ partOne _ =
         ( inputMap, inputFlows ) =
             input
 
-        -- _ =
-        -- inputMap |> .size |> Debug.log "size"
+        _ =
+            inputMap |> .size |> Debug.log "size"
     in
     partOneHelper inputMap inputFlows
         |> countAllWater
@@ -202,10 +203,16 @@ partOne _ =
 
 partOneHelper : Map -> List Coordinate -> Map
 partOneHelper inputMap flows =
-    -- let
-    -- _ =
-    -- Debug.log "flowing to..." flows
-    -- in
+    let
+        _ =
+            Debug.log "flowing to..." flows
+
+        sortAndFilter =
+            List.map (\( a, b ) -> ( b, a ))
+                >> Set.fromList
+                >> Set.toList
+                >> List.map (\( a, b ) -> ( b, a ))
+    in
     case flows of
         [] ->
             inputMap
@@ -213,14 +220,14 @@ partOneHelper inputMap flows =
         nextFlow :: tail ->
             inputMap
                 |> flowOneStep nextFlow
-                |> (\( m, l ) -> partOneHelper m (List.append tail l))
+                |> (\( m, l ) -> partOneHelper m (List.append tail l |> sortAndFilter))
 
 
 flowOneStep : Coordinate -> Map -> ( Map, List Coordinate )
 flowOneStep flowCoordinate inputMap =
     let
         ( x, y ) =
-            flowCoordinate
+            flowCoordinate |> Debug.log "flowing to"
 
         nextCoordinates =
             if flowCoordinate |> down |> isValidFlow inputMap then

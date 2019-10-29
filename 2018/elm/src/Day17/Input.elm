@@ -1,6 +1,6 @@
 module Day17.Input exposing (..)
 
-import Matrix exposing (Matrix)
+import Array2DMatrix as Matrix exposing (Matrix)
 import Parser exposing (..)
 
 
@@ -204,6 +204,19 @@ ensure resultA =
 
 
 rawInput =
+    {--
+    """
+x=495, y=2..7
+y=7, x=495..501
+x=501, y=3..7
+x=498, y=2..4
+x=506, y=1..2
+x=498, y=10..13
+x=504, y=10..13
+y=13, x=498..504
+    """
+--}
+    --{--
     """
 x=531, y=15..33
 y=658, x=645..649
@@ -2047,4 +2060,5 @@ x=493, y=711..720
 y=719, x=378..395
 y=524, x=623..630
     """
+        --}
         |> String.trim
