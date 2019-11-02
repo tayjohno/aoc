@@ -3,7 +3,9 @@ module Day18 exposing (partOne, partTwo)
 import Answer exposing (Answer(..))
 import Coordinate exposing (Coordinate)
 import Day18.Input exposing (..)
+import Dict exposing (Dict)
 import Matrix exposing (Matrix)
+import Murmur3
 
 
 
@@ -225,46 +227,104 @@ partOne _ =
     let
         roundTenMap =
             advanceDays 10 input
-
-        countAll a =
-            roundTenMap |> Matrix.findAll ((==) a) |> List.length
     in
-    countAll Tree
-        * countAll Lumberyard
+    countAll Tree roundTenMap
+        * countAll Lumberyard roundTenMap
         |> String.fromInt
         |> Solved
 
 
 partTwo : () -> Answer String
 partTwo _ =
-    -- let
-    --     roundTenMap =
-    --         advanceDays 1000000000 input
-    --
-    --     countAll a =
-    --         roundTenMap |> Matrix.findAll ((==) a) |> List.length
-    -- in
-    -- countAll Tree
-    --     * countAll Lumberyard
-    --     |> String.fromInt
-    --     |> Solved
-    Faked "190836"
+    let
+        previousMapDict : Dict Int Int
+        previousMapDict =
+            Dict.empty
+
+        rounds =
+            1000000000
+
+        finalMap =
+            partTwoHelper previousMapDict input rounds
+    in
+    countAll Tree finalMap
+        * countAll Lumberyard finalMap
+        |> String.fromInt
+        |> Solved
+
+
+
+-- Faked "190836"
+
+
+partTwoHelper : Dict Int Int -> Map -> Int -> Map
+partTwoHelper previousMaps map roundsRemaining =
+    let
+        {- Hash the current map to an integer -}
+        mapHash : Int
+        mapHash =
+            map
+                |> Matrix.toString tileToChar
+                |> Murmur3.hashString 9132157123
+
+        {- If the current map has been seen before, return how many turns
+           ago it was seen.
+        -}
+        detectLoop : Maybe Int
+        detectLoop =
+            case Dict.get mapHash previousMaps of
+                Nothing ->
+                    Nothing
+
+                Just previousTurn ->
+                    Just (previousTurn - roundsRemaining)
+    in
+    case detectLoop of
+        Nothing ->
+            partTwoHelper
+                (Dict.insert mapHash roundsRemaining previousMaps)
+                (tick map)
+                (roundsRemaining - 1)
+
+        Just i ->
+            let
+                daysUntilMatchingFinal =
+                    modBy i roundsRemaining
+            in
+            advanceDays daysUntilMatchingFinal map
+
+
+countAll : Tile -> Map -> Int
+countAll tile =
+    Matrix.findAll ((==) tile)
+        >> List.length
+
+
+tileToChar : Tile -> Char
+tileToChar tile =
+    case tile of
+        Open ->
+            '.'
+
+        Tree ->
+            '|'
+
+        Lumberyard ->
+            '#'
 
 
 advanceDays : Int -> Map -> Map
 advanceDays count map =
-    let
-        countAll a =
-            map |> Matrix.findAll ((==) a) |> List.length
-    in
     if count <= 0 then
         map
 
     else
-        map
-            -- |> prettyPrintMap
-            |> Matrix.map tileChange
-            |> advanceDays (count - 1)
+        advanceDays (count - 1) (tick map)
+
+
+tick : Map -> Map
+tick map =
+    Matrix.map tileChange map
 
 
 tileChange : Coordinate -> Map -> Tile

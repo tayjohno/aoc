@@ -95,13 +95,21 @@ toRows matrix =
         ( width, height ) =
             matrix.size
     in
-    toRowsOfWidth width matrix.data
+    toRowsOfWidth width matrix.data []
+        |> List.reverse
 
 
-toRowsOfWidth : Int -> Array a -> List (List a)
-toRowsOfWidth width data =
-    Array.toList (Array.slice 0 width data)
-        :: toRowsOfWidth width (Array.slice width (Array.length data) data)
+toRowsOfWidth : Int -> Array a -> List (List a) -> List (List a)
+toRowsOfWidth width data list =
+    case Array.length data of
+        0 ->
+            List.reverse list
+
+        _ ->
+            toRowsOfWidth
+                width
+                (Array.slice width (Array.length data) data)
+                (Array.toList (Array.slice 0 width data) :: list)
 
 
 fromRows : List (List a) -> a -> Matrix a

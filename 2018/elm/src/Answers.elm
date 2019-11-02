@@ -100,24 +100,25 @@ notImplemented _ =
 
 initialConfiguration : List Day
 initialConfiguration =
-    [ newDay "December One" Day01.partOne Day01.partTwo
-    , newDay "December Two" Day02.partOne Day02.partTwo
-    , newDay "December Three" Day03.partOne Day03.partTwo
-    , newDay "December Four" Day04.partOne Day04.partTwo
-    , newDay "December Five" Day05.partOne Day05.partTwo
-    , newDay "December Six" Day06.partOne Day06.partTwo
-    , newDay "December Seven" Day07.partOne Day07.partTwo
-    , newDay "December Eight" Day08.partOne Day08.partTwo
-    , newDay "December Nine" Day09.partOne Day09.partTwo
-    , newDay "December Ten" Day10.partOne Day10.partTwo
-    , newDay "December Eleven" Day11.partOne Day11.partTwo
-    , newDay "December Twelve" Day12.partOne Day12.partTwo
-    , newDay "December Thirteen" Day13.partOne Day13.partTwo
-    , newDay "December Fourteen" Day14.partOne Day14.partTwo
-    , newDay "December Fifteen" Day15.partOne Day15.partTwo
-    , newDay "December Sixteen" Day16.partOne Day16.partTwo
-    , newDay "December Seventeen" Day17.partOne Day17.partTwo
-    , newDay "December Eighteen" Day18.partOne Day18.partTwo
+    [ -- newDay "December One" Day01.partOne Day01.partTwo
+      -- , newDay "December Two" Day02.partOne Day02.partTwo
+      -- , newDay "December Three" Day03.partOne Day03.partTwo
+      -- , newDay "December Four" Day04.partOne Day04.partTwo
+      -- , newDay "December Five" Day05.partOne Day05.partTwo
+      -- , newDay "December Six" Day06.partOne Day06.partTwo
+      -- , newDay "December Seven" Day07.partOne Day07.partTwo
+      -- , newDay "December Eight" Day08.partOne Day08.partTwo
+      -- , newDay "December Nine" Day09.partOne Day09.partTwo
+      -- , newDay "December Ten" Day10.partOne Day10.partTwo
+      -- , newDay "December Eleven" Day11.partOne Day11.partTwo
+      -- , newDay "December Twelve" Day12.partOne Day12.partTwo
+      -- , newDay "December Thirteen" Day13.partOne Day13.partTwo
+      -- , newDay "December Fourteen" Day14.partOne Day14.partTwo
+      -- , newDay "December Fifteen" Day15.partOne Day15.partTwo
+      -- , newDay "December Sixteen" Day16.partOne Day16.partTwo
+      -- , newDay "December Seventeen" Day17.partOne Day17.partTwo
+      -- ,
+      newDay "December Eighteen" Day18.partOne Day18.partTwo
     , newDay "December Nineteen" Day19.partOne Day19.partTwo
     , newDay "December Twenty" Day20.partOne Day20.partTwo
     , newDay "December Twenty-One" Day21.partOne Day21.partTwo
