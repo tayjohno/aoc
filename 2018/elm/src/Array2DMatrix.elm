@@ -1,6 +1,14 @@
-module Array2DMatrix exposing (Coordinate, Matrix, Size, allCoordinates, allCoordinatesHelper, customPrint, empty, findAll, fromRows, get, locations, prettyPrint, set, toRows, toString, transformElement)
+module Array2DMatrix exposing (Matrix, Size, allCoordinates, allCoordinatesHelper, customPrint, eightNeighbors, empty, findAll, fromRows, get, locations, map, prettyPrint, set, toRows, toString, transformElement)
+
+{-
+   This was originally created as an alternative to Matrix, but it turns
+   out that it wasn't necessary. It's possible that it would be faster,
+   but for now I'm just deprecating it and switching everything back to
+   Matrix.
+-}
 
 import Array exposing (Array)
+import Coordinate exposing (Coordinate, down, left, right, up)
 
 
 type alias Matrix a =
@@ -10,12 +18,6 @@ type alias Matrix a =
 {-| (width, height)
 -}
 type alias Size =
-    ( Int, Int )
-
-
-{-| ( x, y )
--}
-type alias Coordinate =
     ( Int, Int )
 
 
@@ -181,6 +183,24 @@ findAll function matrix =
             )
 
 
+map : (Coordinate -> Matrix a -> a) -> Matrix a -> Matrix a
+map function matrix =
+    matrix
+        |> allCoordinates
+        |> List.foldl
+            (\coordinate ->
+                set coordinate (function coordinate matrix)
+            )
+            matrix
+
+
+eightNeighbors : Matrix a -> Coordinate -> List a
+eightNeighbors matrix coord =
+    coord
+        |> Coordinate.eightNeighbors
+        |> List.filterMap (\c -> get c matrix)
+
+
 toString : (a -> Char) -> Matrix a -> String
 toString coersion matrix =
     toStringHelper coersion (toRows matrix)
@@ -246,33 +266,6 @@ customPrintHelper function row matrix =
                     |> Maybe.andThen (Debug.log "" >> Just)
         in
         customPrintHelper function (row + 1) matrix
-
-
-
--- if index >= mWidth matrix * mHeight matrix then
---     Debug.log "" row |> always matrix
---
--- else if modBy (mWidth matrix) index == 0 then
---     let
---         _ =
---             if index /= 0 then
---                 Just (Debug.log "" row)
---
---             else
---                 Nothing
---     in
---     customPrintHelper
---         function
---         ""
---         (index + 1)
---         matrix
---
--- else
---     customPrintHelper
---         function
---         (Array.get index matrix.data |> Maybe.map function |> Maybe.withDefault ' ' |> String.fromChar |> String.append row)
---         (index + 1)
---         matrix
 
 
 {-| Convert an array index to a coordinate.

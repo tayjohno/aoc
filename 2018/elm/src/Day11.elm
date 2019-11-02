@@ -1,7 +1,8 @@
 module Day11 exposing (calculateScore, empty, input, mapCoordinates, mapCoordinatesHelper, partOne, partTwo, scoreTotaller)
 
 import Answer exposing (Answer(..))
-import Matrix exposing (Coordinate, Matrix)
+import Coordinate exposing (Coordinate)
+import Matrix exposing (Matrix)
 
 
 input : Int

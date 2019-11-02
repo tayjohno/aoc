@@ -1,6 +1,7 @@
 module Day13 exposing (partOne, partTwo)
 
 import Answer exposing (Answer(..))
+import Coordinate exposing (Coordinate)
 import Day13.Input exposing (Cart, Heading(..), Map, Tile(..), TurnDirection(..), input)
 import Matrix
 
@@ -210,14 +211,14 @@ partTwo _ =
         |> Solved
 
 
-coordinateToString : Matrix.Coordinate -> String
+coordinateToString : Coordinate -> String
 coordinateToString ( x, y ) =
     String.fromInt x
         ++ ","
         ++ String.fromInt y
 
 
-simulateCrash : Map -> Matrix.Coordinate
+simulateCrash : Map -> Coordinate
 simulateCrash map =
     case tickOne map of
         Safe carts ->
@@ -227,7 +228,7 @@ simulateCrash map =
             location
 
 
-simulateAllCrashes : Map -> Matrix.Coordinate
+simulateAllCrashes : Map -> Coordinate
 simulateAllCrashes map =
     case tickTwo map of
         One cart ->
@@ -239,7 +240,7 @@ simulateAllCrashes map =
 
 type TickResult a
     = Safe a
-    | Crash Matrix.Coordinate
+    | Crash Coordinate
 
 
 type CrashesResult
@@ -300,7 +301,7 @@ tickTwoHelper map checked toCheck =
                     tickTwoHelper map (removeCrash location checked) (removeCrash location tail)
 
 
-removeCrash : Matrix.Coordinate -> List Cart -> List Cart
+removeCrash : Coordinate -> List Cart -> List Cart
 removeCrash coordinate =
     List.filter (.coordinate >> (/=) coordinate)
 

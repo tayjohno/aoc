@@ -1,6 +1,6 @@
 module Day06.Input exposing (input)
 
-import Matrix exposing (Coordinate)
+import Coordinate exposing (Coordinate)
 import Parser exposing ((|.), (|=), Parser, int, run, spaces, succeed, symbol)
 
 

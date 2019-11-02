@@ -1,8 +1,9 @@
 module Day17 exposing (partOne, partTwo)
 
 import Answer exposing (Answer(..))
-import Array2DMatrix as Matrix exposing (Coordinate)
+import Coordinate exposing (Coordinate)
 import Day17.Input exposing (Map, Tile(..), WaterStatus(..), input, prettyPrintMap)
+import Matrix
 import Set
 
 

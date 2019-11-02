@@ -6,6 +6,25 @@ import Matrix exposing (Matrix)
 import Parser exposing (..)
 
 
+input : Cave
+input =
+    newCave rawInput
+
+
+newCave : String -> Cave
+newCave string =
+    let
+        parsedCave =
+            run caveParser string
+    in
+    case parsedCave of
+        Result.Err _ ->
+            Debug.todo "Couldn't parse a map"
+
+        Result.Ok cave ->
+            cave |> setInitialCoordinates
+
+
 caveParser : Parser Cave
 caveParser =
     succeed (\a -> Matrix.fromRows a Wall)
@@ -63,25 +82,6 @@ setInitialCoordinates cave =
                 Matrix.set coordinate (Open (Just { creature | startingCoordinate = coordinate })) foldCave
             )
             cave
-
-
-newCave : String -> Cave
-newCave string =
-    let
-        parsedCave =
-            run caveParser string
-    in
-    case parsedCave of
-        Result.Err _ ->
-            Debug.todo "Couldn't parse a map"
-
-        Result.Ok cave ->
-            cave |> setInitialCoordinates
-
-
-input : Cave
-input =
-    newCave rawInput
 
 
 rawInput : String

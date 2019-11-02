@@ -1,6 +1,7 @@
 module Day17.Input exposing (..)
 
-import Array2DMatrix as Matrix exposing (Matrix)
+import Coordinate exposing (Coordinate)
+import Matrix exposing (Matrix)
 import Parser exposing (..)
 
 
@@ -123,7 +124,7 @@ digitChain =
 
 {-| Returns a compact map (one where x and y values only include the minimum required problem set). Also returns the starting point for the flowing water.
 -}
-input : ( Map, List Matrix.Coordinate )
+input : ( Map, List Coordinate )
 input =
     let
         data =
@@ -163,12 +164,12 @@ prettyPrintMap map =
         |> always map
 
 
-populateMap : ScanData -> Matrix.Coordinate -> Map -> Map
+populateMap : ScanData -> Coordinate -> Map -> Map
 populateMap scanData origin map =
     List.foldl (addClay origin) map scanData
 
 
-addClay : Matrix.Coordinate -> ScanDatum -> Map -> Map
+addClay : Coordinate -> ScanDatum -> Map -> Map
 addClay ( originX, originY ) scanDatum map =
     let
         xVals =
@@ -203,8 +204,7 @@ ensure resultA =
             a
 
 
-rawInput =
-    {--
+sampleRawInput =
     """
 x=495, y=2..7
 y=7, x=495..501
@@ -215,8 +215,10 @@ x=498, y=10..13
 x=504, y=10..13
 y=13, x=498..504
     """
---}
-    --{--
+        |> String.trim
+
+
+rawInput =
     """
 x=531, y=15..33
 y=658, x=645..649
@@ -2060,5 +2062,4 @@ x=493, y=711..720
 y=719, x=378..395
 y=524, x=623..630
     """
-        --}
         |> String.trim

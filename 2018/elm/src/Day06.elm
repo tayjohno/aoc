@@ -2,9 +2,10 @@ module Day06 exposing (partOne, partTwo)
 
 import Answer exposing (Answer(..))
 import Array exposing (Array)
+import Coordinate exposing (Coordinate)
 import Day06.Input exposing (input)
 import List.Unique
-import Matrix exposing (..)
+import Matrix exposing (Matrix)
 
 
 type ClaimStatus
@@ -24,7 +25,7 @@ partOne =
             fullMap =
                 emptyBestFitMatrix input
                     |> addStartingPoints input
-                    |> (\matrix -> updateMap (allCoordinates matrix) matrix)
+                    |> (\matrix -> updateMap (Matrix.allCoordinates matrix) matrix)
 
             regions =
                 fullMap
@@ -70,7 +71,7 @@ debug : Maybe String
 debug =
     emptyBestFitMatrix input
         |> addStartingPoints input
-        |> (\matrix -> updateMap (allCoordinates matrix) matrix)
+        |> (\matrix -> updateMap (Matrix.allCoordinates matrix) matrix)
         |> Matrix.toString claimStatusChar
         |> Just
 

@@ -1,6 +1,7 @@
-module Matrix exposing (Coordinate, Matrix, Size, allCoordinates, allCoordinatesHelper, customPrint, empty, findAll, fromRows, get, locations, prettyPrint, set, toRows, toString, transformElement)
+module Matrix exposing (Matrix, Size, allCoordinates, allCoordinatesHelper, customPrint, eightNeighbors, empty, findAll, fromRows, get, locations, map, prettyPrint, set, toRows, toString, transformElement)
 
 import Array exposing (Array)
+import Coordinate exposing (Coordinate, eightNeighbors)
 
 
 type alias Matrix a =
@@ -8,10 +9,6 @@ type alias Matrix a =
 
 
 type alias Size =
-    ( Int, Int )
-
-
-type alias Coordinate =
     ( Int, Int )
 
 
@@ -156,6 +153,24 @@ findAll function matrix =
                     Just a ->
                         ( a, coordinate )
             )
+
+
+map : (Coordinate -> Matrix a -> a) -> Matrix a -> Matrix a
+map function matrix =
+    matrix
+        |> allCoordinates
+        |> List.foldl
+            (\coordinate ->
+                set coordinate (function coordinate matrix)
+            )
+            matrix
+
+
+eightNeighbors : Matrix a -> Coordinate -> List a
+eightNeighbors matrix coord =
+    coord
+        |> Coordinate.eightNeighbors
+        |> List.filterMap (\c -> get c matrix)
 
 
 toString : (a -> Char) -> Matrix a -> String

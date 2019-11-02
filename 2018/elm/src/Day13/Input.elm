@@ -1,5 +1,6 @@
 module Day13.Input exposing (..)
 
+import Coordinate exposing (Coordinate)
 import Matrix exposing (Matrix)
 import Parser exposing (..)
 
@@ -22,7 +23,7 @@ type Tile
 
 
 type alias Cart =
-    { coordinate : Matrix.Coordinate
+    { coordinate : Coordinate
     , heading : Heading
     , nextTurn : TurnDirection
     }
@@ -90,7 +91,7 @@ tileParser =
         ]
 
 
-toCoordinate : ( Int, Int ) -> Matrix.Coordinate
+toCoordinate : ( Int, Int ) -> Coordinate
 toCoordinate ( row, col ) =
     ( col - 1, row - 1 )
 

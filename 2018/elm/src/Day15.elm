@@ -1,6 +1,7 @@
 module Day15 exposing (..)
 
 import Answer exposing (Answer(..))
+import Coordinate exposing (Coordinate, down, left, right, up)
 import Day15.Cave as Cave exposing (Cave, Row, Tile(..))
 import Day15.Creature as Creature exposing (Class(..), Creature, CreatureCoordinate)
 import Day15.Input exposing (..)
@@ -485,7 +486,7 @@ moveCreature ( creature, coordinate ) cave =
                 ( ( creature, next ), moveCreatureToSpace ( creature, coordinate ) next cave )
 
 
-moveCreatureToSpace : CreatureCoordinate -> Matrix.Coordinate -> Cave -> Cave
+moveCreatureToSpace : CreatureCoordinate -> Coordinate -> Cave -> Cave
 moveCreatureToSpace ( creature, currentPosition ) newPosition cave =
     let
         creatureToMove =
@@ -497,7 +498,7 @@ moveCreatureToSpace ( creature, currentPosition ) newPosition cave =
         |> Matrix.set newPosition creatureToMove
 
 
-pathToNearestEnemy : Cave -> CreatureCoordinate -> List Matrix.Coordinate
+pathToNearestEnemy : Cave -> CreatureCoordinate -> List Coordinate
 pathToNearestEnemy cave ( creature, coordinate ) =
     breadthFirstSearchForEnemy creature [] [ [ coordinate ] ] [ coordinate ] cave
         |> List.map List.reverse
@@ -509,7 +510,7 @@ pathToNearestEnemy cave ( creature, coordinate ) =
 
 {-| Returns all shortest paths to a space next to an enemy
 -}
-breadthFirstSearchForEnemy : Creature -> List (List Matrix.Coordinate) -> List (List Matrix.Coordinate) -> List Matrix.Coordinate -> Cave -> List (List Matrix.Coordinate)
+breadthFirstSearchForEnemy : Creature -> List (List Coordinate) -> List (List Coordinate) -> List Coordinate -> Cave -> List (List Coordinate)
 breadthFirstSearchForEnemy creature checkedPaths uncheckedPaths checkedCoordinates cave =
     case ( checkedPaths, uncheckedPaths ) of
         ( [], [] ) ->
@@ -545,7 +546,7 @@ breadthFirstSearchForEnemy creature checkedPaths uncheckedPaths checkedCoordinat
                                 |> List.append (lastRoundDepthFirstSearchForEnemy creature tailPaths (List.append possibleSteps checkedCoordinates) cave)
 
 
-lastRoundDepthFirstSearchForEnemy : Creature -> List (List Matrix.Coordinate) -> List Matrix.Coordinate -> Cave -> List (List Matrix.Coordinate)
+lastRoundDepthFirstSearchForEnemy : Creature -> List (List Coordinate) -> List Coordinate -> Cave -> List (List Coordinate)
 lastRoundDepthFirstSearchForEnemy creature uncheckedPaths checkedCoordinates cave =
     case uncheckedPaths of
         [] ->
@@ -577,7 +578,7 @@ lastRoundDepthFirstSearchForEnemy creature uncheckedPaths checkedCoordinates cav
                                 |> List.append (lastRoundDepthFirstSearchForEnemy creature tailPaths (List.append possibleSteps checkedCoordinates) cave)
 
 
-besideEnemy : Creature -> Matrix.Coordinate -> Cave -> Bool
+besideEnemy : Creature -> Coordinate -> Cave -> Bool
 besideEnemy creature coordinate cave =
     neighbors coordinate
         |> List.any
@@ -589,7 +590,7 @@ besideEnemy creature coordinate cave =
             )
 
 
-creatureAt : Cave -> Matrix.Coordinate -> Maybe Creature
+creatureAt : Cave -> Coordinate -> Maybe Creature
 creatureAt cave coordinate =
     case Matrix.get coordinate cave of
         Nothing ->
@@ -615,7 +616,7 @@ isEnemyOf c1 c2 =
             False
 
 
-neighbors : Matrix.Coordinate -> List Matrix.Coordinate
+neighbors : Coordinate -> List Coordinate
 neighbors coordinate =
     [ up coordinate
     , left coordinate
@@ -624,14 +625,14 @@ neighbors coordinate =
     ]
 
 
-validMoves : Cave -> Matrix.Coordinate -> List Matrix.Coordinate
+validMoves : Cave -> Coordinate -> List Coordinate
 validMoves cave coordinate =
     coordinate
         |> neighbors
         |> List.filter (\c -> validMove c cave)
 
 
-validMove : Matrix.Coordinate -> Cave -> Bool
+validMove : Coordinate -> Cave -> Bool
 validMove coordinate cave =
     case Matrix.get coordinate cave of
         Just (Open Nothing) ->
@@ -648,26 +649,6 @@ ensure message function a =
 
     else
         Debug.todo message
-
-
-up : Matrix.Coordinate -> Matrix.Coordinate
-up ( x, y ) =
-    ( x, y - 1 )
-
-
-left : Matrix.Coordinate -> Matrix.Coordinate
-left ( x, y ) =
-    ( x - 1, y )
-
-
-right : Matrix.Coordinate -> Matrix.Coordinate
-right ( x, y ) =
-    ( x + 1, y )
-
-
-down : Matrix.Coordinate -> Matrix.Coordinate
-down ( x, y ) =
-    ( x, y + 1 )
 
 
 nextCreatureToFight : CreatureCoordinate -> Cave -> Maybe CreatureCoordinate
