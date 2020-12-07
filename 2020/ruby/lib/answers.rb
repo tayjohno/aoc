@@ -14,3 +14,6 @@ I4.split("\n\n").map{_1.split.sort.join}.tap{|x|[/(([eib]yr|hgt|[he]cl|pid).+){7
 
 puts "\nday05"
 p I5.split.map{_1.tr("FLBR","001").to_i(2)}.sort.then{((0..p(_1[-1])).to_a-_1)[-1]}
+
+puts "\nday06"
+I6.split("\n\n").map{_1.split("\n").map(&:chars)}.tap{|i|p i.map{_1.flatten.uniq.length}.sum}.tap{|i|p i.map{_1.reduce(:&).length}.sum}
