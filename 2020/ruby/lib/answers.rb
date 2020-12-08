@@ -21,4 +21,4 @@ I6.split("\n\n").map{_1.split("\n").map(&:chars)}.tap{|i|p i.map{_1.flatten.uniq
 puts "\nday07"
 
 puts "\nday08"
-[I8.split("\n").map{|l|l.match(/(\w+) \+?(-?\d+)/)[1..2].then{|a,b|[a,b.to_i]}},{"acc"=>->(v,s){s[:a]+=v;s[:l]+=1},"jmp"=>->(v,s){s[:l]+=v},"nop"=>->(_v,s){s[:l]+=1}},->{{a:0,l:0,h:{}}}].tap{|n,c,l|l[].tap{|s|until(s[:h][s[:l]]&&p(s[:a]))do((s[:h][s[:l]]=1)&&c[n[s[:l]][0]][n[s[:l]][1],s])end}}.tap{|n,c,l|(0..(n.size - 1)).each{|i|l[].tap{|s|n.map(&:clone).tap{|n|n[i][0]=n[i][0].tr("jmno","nojm")}.tap{|n| until(s[:l]==n.size&&p(s[:a]))||s[:h][s[:l]]do((s[:h][s[:l]]=1)&&c[n[s[:l]][0]][n[s[:l]][1],s])end}}}}
+[I8.split("\n").map{|l|l.match(/(\w+) (.\d+)/)[1..2].then{|a,b|[a,b.to_i]}},{"acc"=>->(v,s){s[:a]+=v;s[:l]+=1},"jmp"=>->(v,s){s[:l]+=v},"nop"=>->(_v,s){s[:l]+=1}},->{{a:0,l:0,h:{}}}].tap{|n,c,l|l[].tap{|s|until(s[:h][s[:l]]&&p(s[:a]))do((s[:h][s[:l]]=1)&&c[n[s[:l]][0]][n[s[:l]][1],s])end}}.tap{|n,c,l|(0..(n.size-1)).each{|i|l[].tap{|s|n.map(&:clone).tap{|n|n[i][0]=n[i][0].tr("jmno","nojm")}.tap{|n| until(s[:l]==n.size&&p(s[:a]))||s[:h][s[:l]]do((s[:h][s[:l]]=1)&&c[n[s[:l]][0]][n[s[:l]][1],s])end}}}}
