@@ -29,3 +29,11 @@ p I9.split("\n").map(&:to_i).then{[_1[0..24],_1[25..-1]]}.then{|h,l|[h+l,h.dup.t
 
 puts "\nday10" # 216 characters
 p I10.split.map(&:to_i).sort.tap{|v|p (0..v.size-2).reduce({1=>1,3=>1}){|o,i|o.tap{_1[v[i+1]-v[i]]+=1}}.values.reduce(:*)}.then{|v|->(){c=->(i,m){m[i]||=(i+1..i+3).map{v.include?(_1)?c[_1,m]:0}.sum}}[][0,{v.max=>1}]}
+
+puts "\nday11" # 482 characters ONLY PART TWO
+# p I11.split.map(&:chars).then{|o|[o,o.dup.map(&:dup),o.size-1,o.first.size-1]}.tap{|o,c,j,k|->(x,y,m){[*-1..1].repeated_permutation(2).reject{_1|_2==0}.map{|d,e|(s=->(x,y,d,e,m){(x<0||y<0||x>j||y>k)?nil :(m[x][y]!=".")?m[x][y]:s[x+d,y+e,d,e,m]})[x+d,y+e,d,e,m]}}.tap{|a|loop{(0..j).each{|x|(0..k).each{|y|c[x][y]=o[x][y]=="L"&&!a[x,y,o].any?{|c|c=="#"}?"#":o[x][y]=="#"&&a[x,y,o].count{|c|c=="#"}>=5?"L":c[x][y]}}&&(break if c==o)||(o=c.dup.map(&:dup))}}}[1].flatten.count{_1=="#"}
+
+puts "\nday12"
+
+puts "\nday13" # 282 characters
+I13.split.then{[_1[0].to_i,_1[1].split(",").map(&:to_i).map.with_index.reject{|i|i[0]<1}]}.tap{|t,z|p z.map{|b,_|[b-(t%b)+t,b]}.min.then{(_1-t)*_2}}.then{|_,z|p ([z[0][0]]*2).tap{|s| z[1..-1].each {|b,t|(1..).lazy.map{s[0]+(_1*s[1])}.find{|i|(i+t)%b==0 and s[0]=i and s[1]*=b}}}[0]}
