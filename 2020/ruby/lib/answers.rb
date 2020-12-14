@@ -35,5 +35,5 @@ puts "\nday11" # 482 characters ONLY PART TWO
 
 puts "\nday12"
 
-puts "\nday13" # 282 characters
-I13.split.then{[_1[0].to_i,_1[1].split(",").map(&:to_i).map.with_index.reject{|i|i[0]<1}]}.tap{|t,z|p z.map{|b,_|[b-(t%b)+t,b]}.min.then{(_1-t)*_2}}.then{|_,z|p ([z[0][0]]*2).tap{|s| z[1..-1].each {|b,t|(1..).lazy.map{s[0]+(_1*s[1])}.find{|i|(i+t)%b==0 and s[0]=i and s[1]*=b}}}[0]}
+puts "\nday13" # 273 characters
+I13.split.then{[_1[0].to_i,_1[1].split(",").map(&:to_i).map.with_index.reject{|i|i[0]<1}]}.tap{|t,z|p z.map{|b,|[b-(t%b)+t,b]}.min.then{(_1-t)*_2}}.then{|_,(y,*z)|p ([y[0]]*2).tap{|s|z.each{|b,t|(1..).lazy.map{s[0]+(_1*s[1])}.find{|i|(i+t)%b==0and s[0]=i and s[1]*=b}}}[0]}
